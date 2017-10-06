@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Basic AI.unity
+- path: Assets/Scenes/Basic AI.unity
   isLoaded: 1
   isActive: 1
