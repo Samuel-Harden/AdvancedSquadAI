@@ -39,6 +39,11 @@ public class PlayerCommands : MonoBehaviour
 
     void CommandInput()
     {
+        if (Input.GetButtonUp("SquadFormUp"))
+        {
+            FollowCommands();
+        }
+
         if (Input.GetButtonUp("Squadie1Action") || Input.GetButtonUp("Squadie2Action") || Input.GetButtonUp("SquadAction"))
         {
 
@@ -65,6 +70,14 @@ public class PlayerCommands : MonoBehaviour
                 }
             }
         }
+    }
+
+
+
+    private void FollowCommands()
+    {
+        squadie_one.FollowPlayer();
+        squadie_two.FollowPlayer();
     }
 
 

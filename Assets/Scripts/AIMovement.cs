@@ -4,8 +4,11 @@ using System.Collections;
 
 public class AIMovement : MonoBehaviour
 {
+    public Transform player;
     public Vector3 target;
     UnityEngine.AI.NavMeshAgent agent;
+
+    private bool follow_player;
 
 	// Use this for initialization
 	void Start ()
@@ -17,6 +20,10 @@ public class AIMovement : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
+        if(follow_player == true)
+        {
+            target = player.position;
+        }
         agent.SetDestination(target);
 	}
 
@@ -24,5 +31,13 @@ public class AIMovement : MonoBehaviour
     public void MoveOrder(Vector3 _pos)
     {
         target = _pos;
+        follow_player = false;
+    }
+
+
+
+    public void FollowPlayer()
+    {
+        follow_player = true;
     }
 }
