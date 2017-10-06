@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class PlayerCommands : MonoBehaviour
 {
@@ -9,7 +10,16 @@ public class PlayerCommands : MonoBehaviour
     public AIMovement squadie_one;
     public AIMovement squadie_two;
 
+    private GameObject prev_cover_squadie_one;
+    private GameObject prev_cover_squadie_two;
+
+    private int squadie_one_pos_id;
+    private int squadie_two_pos_id;
+
     private float distance;
+
+
+
     // Use this for initialization
     void Start()
     {
@@ -29,8 +39,9 @@ public class PlayerCommands : MonoBehaviour
 
     void CommandInput()
     {
-        if (Input.GetKeyUp(KeyCode.Alpha1))
+        if (Input.GetButtonUp("Squadie1Action") || Input.GetButtonUp("Squadie2Action") || Input.GetButtonUp("SquadAction"))
         {
+
             RaycastHit hit;
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
@@ -40,17 +51,115 @@ public class PlayerCommands : MonoBehaviour
                 // Identify object hit
                 if(hit.collider.tag == "Full Cover")
                 {
-                    // Set TargetIndicator Hit Pos
-                    SetTargetIndicator(hit.point);
+                    CoverCommands(hit);
+                }
 
-                    Debug.Log(hit.point);
+                else if(hit.collider.tag == "Low Cover")
+                {
 
-                    // Set Position for Squad Member One
+                }
 
-                    SquadMemberMoveOrder(squadie_one, hit.collider.gameObject.GetComponent<CoverPositions>().GetPosition(hit.point));
+                else if(hit.collider.tag == "Ground")
+                {
+                    MoveCommands(hit);
                 }
             }
         }
+    }
+
+
+
+    private void CoverCommands(RaycastHit _hit)
+    {
+        // Set TargetIndicator Hit Pos
+        SetTargetIndicator(_hit.point);
+
+        if (Input.GetButtonUp("Squadie1Action"))
+        {
+            SquadieOneCoverOrder(_hit);
+        }
+
+        else if (Input.GetButtonUp("Squadie2Action"))
+        {
+            SquadieTwoCoverOrder(_hit);
+        }
+
+        else if (Input.GetButtonUp("SquadAction"))
+        {
+            SquadieOneCoverOrder(_hit);
+            SquadieTwoCoverOrder(_hit);
+        }
+    }
+
+
+
+    private void MoveCommands(RaycastHit _hit)
+    {
+        // Set TargetIndicator Hit Pos
+        SetTargetIndicator(_hit.point);
+
+        if (Input.GetButtonUp("Squadie1Action"))
+        {
+            SquadieOneMoveOrder(_hit);
+        }
+
+        else if (Input.GetButtonUp("Squadie2Action"))
+        {
+            SquadieTwoMoveOrder(_hit);
+        }
+
+        else if (Input.GetButtonUp("SquadAction"))
+        {
+            SquadieOneMoveOrder(_hit);
+            SquadieTwoMoveOrder(_hit);
+        }
+    }
+
+
+
+    private void SquadieOneMoveOrder(RaycastHit _hit)
+    {
+        // Move to position, find nearest cover if in danger
+        squadie_one.MoveOrder(_hit.point);
+    }
+
+
+
+    private void SquadieTwoMoveOrder(RaycastHit _hit)
+    {
+        // Move to position, find nearest cover if in danger
+        squadie_two.MoveOrder(_hit.point);
+    }
+
+
+
+    private void SquadieOneCoverOrder(RaycastHit _hit)
+    {
+        if (prev_cover_squadie_one != null)
+        {
+            prev_cover_squadie_one.GetComponent<CoverPositions>().CoverInUseReset(squadie_one_pos_id);
+        }
+
+        // Set Squadie1 Move order
+        SquadMemberMoveOrder(squadie_one, _hit.collider.gameObject.GetComponent<CoverPositions>().GetPosition(_hit.point, ref squadie_one_pos_id));
+
+        // Create Reference to previous Cover Object
+        prev_cover_squadie_one = _hit.collider.gameObject;
+    }
+
+
+    private void SquadieTwoCoverOrder(RaycastHit _hit)
+    {
+        if (prev_cover_squadie_two != null)
+        {
+            prev_cover_squadie_two.GetComponent<CoverPositions>().CoverInUseReset(squadie_two_pos_id);
+        }
+
+        // Set Squadie1 Move order
+        SquadMemberMoveOrder(squadie_two, _hit.collider.gameObject.GetComponent<CoverPositions>().GetPosition(_hit.point, ref squadie_two_pos_id));
+
+        // Create Reference to previous Cover Object
+        prev_cover_squadie_two = _hit.collider.gameObject;
     }
 
 
