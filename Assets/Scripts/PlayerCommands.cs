@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerCommands : MonoBehaviour
 {
@@ -9,6 +9,8 @@ public class PlayerCommands : MonoBehaviour
 
     public AIMovement squadie_one;
     public AIMovement squadie_two;
+
+    public SquadPositionFollow squad_pos_follow;
 
     private GameObject prev_cover_squadie_one;
     private GameObject prev_cover_squadie_two;
