@@ -76,25 +76,6 @@ public class PlayerCommands : MonoBehaviour
 
 
 
-    private void FollowCommand()
-    {
-        if (Vector3.Distance(squadie_one.transform.position, transform.position) < Vector3.Distance(squadie_two.transform.position, transform.position))
-        {
-            SquadieOneFormUp();
-
-            StartCoroutine(SquadieTwoFormUpDelay());
-        }
-
-        else
-        {
-            SquadieTwoFormUp();
-
-            StartCoroutine(SquadieOneFormUpDelay());
-        }
-    }
-
-
-
     private void CoverCommands(RaycastHit _hit)
     {
         // Set TargetIndicator Hit Pos
@@ -102,29 +83,52 @@ public class PlayerCommands : MonoBehaviour
 
         if (Input.GetButtonUp("Squadie1Action"))
         {
+            SquadieOneCoverReset();
             SquadieOneCoverOrder(_hit);
         }
 
         else if (Input.GetButtonUp("Squadie2Action"))
         {
+            SquadieTwoCoverReset();
             SquadieTwoCoverOrder(_hit);
         }
 
         else if (Input.GetButtonUp("SquadAction"))
         {
+            SquadieOneCoverReset();
+            SquadieTwoCoverReset();
+
             if (Vector3.Distance(squadie_one.transform.position, _hit.point) < Vector3.Distance(squadie_two.transform.position, _hit.point))
             {
                 SquadieOneCoverOrder(_hit);
-
                 StartCoroutine(SquadieTwoCoverOrderDelay(_hit));
             }
 
             else
             {
                 SquadieTwoCoverOrder(_hit);
-
                 StartCoroutine(SquadieOneCoverOrderDelay(_hit));
             }
+        }
+    }
+
+
+
+    private void FollowCommand()
+    {
+        SquadieOneCoverReset();
+        SquadieTwoCoverReset();
+
+        if (Vector3.Distance(squadie_one.transform.position, transform.position) < Vector3.Distance(squadie_two.transform.position, transform.position))
+        {
+            SquadieOneFormUp();
+            StartCoroutine(SquadieTwoFormUpDelay());
+        }
+
+        else
+        {
+            SquadieTwoFormUp();
+            StartCoroutine(SquadieOneFormUpDelay());
         }
     }
 
@@ -137,25 +141,32 @@ public class PlayerCommands : MonoBehaviour
 
         if (Input.GetButtonUp("Squadie1Action"))
         {
+            SquadieOneCoverReset();
             SquadieOneMoveOrder(_hit);
         }
 
         else if (Input.GetButtonUp("Squadie2Action"))
         {
+            SquadieTwoCoverReset();
             SquadieTwoMoveOrder(_hit);
         }
 
         else if (Input.GetButtonUp("SquadAction"))
         {
+            SquadieOneCoverReset();
+            SquadieTwoCoverReset();
+
             if (Vector3.Distance(squadie_one.transform.position, _hit.point) < Vector3.Distance(squadie_two.transform.position, _hit.point))
             {
                 SquadieOneMoveOrder(_hit);
+
                 StartCoroutine(SquadieTwoMoveOrderDelay(_hit));
             }
 
             else
             {
                 SquadieTwoMoveOrder(_hit);
+
                 StartCoroutine(SquadieOneMoveOrderDelay(_hit));
             }
         }
@@ -166,11 +177,6 @@ public class PlayerCommands : MonoBehaviour
     private void SquadieOneFormUp()
     {
         squadie_one.FollowPlayer();
-
-        if (prev_cover_squadie_one != null)
-        {
-            prev_cover_squadie_one.GetComponent<CoverPositions>().CoverInUseReset(squadie_one_pos_id);
-        }
     }
 
 
@@ -180,11 +186,6 @@ public class PlayerCommands : MonoBehaviour
         yield return new WaitForSeconds(1);
 
         squadie_one.FollowPlayer();
-
-        if (prev_cover_squadie_one != null)
-        {
-            prev_cover_squadie_one.GetComponent<CoverPositions>().CoverInUseReset(squadie_one_pos_id);
-        }
     }
 
 
@@ -192,11 +193,6 @@ public class PlayerCommands : MonoBehaviour
     private void SquadieTwoFormUp()
     {
         squadie_two.FollowPlayer();
-
-        if (prev_cover_squadie_two != null)
-        {
-            prev_cover_squadie_two.GetComponent<CoverPositions>().CoverInUseReset(squadie_two_pos_id);
-        }
     }
 
 
@@ -206,24 +202,13 @@ public class PlayerCommands : MonoBehaviour
         yield return new WaitForSeconds(1);
 
         squadie_two.FollowPlayer();
-
-        if (prev_cover_squadie_two != null)
-        {
-            prev_cover_squadie_two.GetComponent<CoverPositions>().CoverInUseReset(squadie_two_pos_id);
-        }
     }
 
 
 
     private void SquadieOneMoveOrder(RaycastHit _hit)
     {
-        // Move to position, find nearest cover if in danger
         squadie_one.MoveOrder(_hit.point);
-
-        if (prev_cover_squadie_one != null)
-        {
-            prev_cover_squadie_one.GetComponent<CoverPositions>().CoverInUseReset(squadie_one_pos_id);
-        }
     }
 
 
@@ -231,26 +216,15 @@ public class PlayerCommands : MonoBehaviour
     private IEnumerator SquadieOneMoveOrderDelay(RaycastHit _hit)
     {
         yield return new WaitForSeconds(1);
-        // Move to position, find nearest cover if in danger
-        squadie_one.MoveOrder(_hit.point);
 
-        if (prev_cover_squadie_one != null)
-        {
-            prev_cover_squadie_one.GetComponent<CoverPositions>().CoverInUseReset(squadie_one_pos_id);
-        }
+        squadie_one.MoveOrder(_hit.point);
     }
 
 
 
     private void SquadieTwoMoveOrder(RaycastHit _hit)
     {
-        // Move to position, find nearest cover if in danger
         squadie_two.MoveOrder(_hit.point);
-
-        if (prev_cover_squadie_two != null)
-        {
-            prev_cover_squadie_two.GetComponent<CoverPositions>().CoverInUseReset(squadie_two_pos_id);
-        }
     }
 
 
@@ -258,24 +232,14 @@ public class PlayerCommands : MonoBehaviour
     private IEnumerator SquadieTwoMoveOrderDelay(RaycastHit _hit)
     {
         yield return new WaitForSeconds(1);
-        // Move to position, find nearest cover if in danger
-        squadie_two.MoveOrder(_hit.point);
 
-        if (prev_cover_squadie_two != null)
-        {
-            prev_cover_squadie_two.GetComponent<CoverPositions>().CoverInUseReset(squadie_two_pos_id);
-        }
+        squadie_two.MoveOrder(_hit.point);
     }
 
 
 
     private void SquadieOneCoverOrder(RaycastHit _hit)
     {
-        if (prev_cover_squadie_one != null)
-        {
-            prev_cover_squadie_one.GetComponent<CoverPositions>().CoverInUseReset(squadie_one_pos_id);
-        }
-
         // Set Squadie1 Move order
         SquadMemberMoveOrder(squadie_one, _hit.collider.gameObject.GetComponent<CoverPositions>().GetPosition(_hit.point, ref squadie_one_pos_id));
 
@@ -286,16 +250,18 @@ public class PlayerCommands : MonoBehaviour
 
     private void SquadieTwoCoverOrder(RaycastHit _hit)
     {
-        if (prev_cover_squadie_two != null)
-        {
-            prev_cover_squadie_two.GetComponent<CoverPositions>().CoverInUseReset(squadie_two_pos_id);
-        }
-
         // Set Squadie1 Move order
         SquadMemberMoveOrder(squadie_two, _hit.collider.gameObject.GetComponent<CoverPositions>().GetPosition(_hit.point, ref squadie_two_pos_id));
 
         // Create Reference to previous Cover Object
         prev_cover_squadie_two = _hit.collider.gameObject;
+    }
+
+
+
+    private void SquadCoverOrder(RaycastHit _hit)
+    {
+
     }
 
 
@@ -312,6 +278,26 @@ public class PlayerCommands : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         SquadieTwoCoverOrder(_hit);
+    }
+
+
+
+    private void SquadieOneCoverReset()
+    {
+        if (prev_cover_squadie_one != null)
+        {
+            prev_cover_squadie_one.GetComponent<CoverPositions>().CoverInUseReset(squadie_one_pos_id);
+        }
+    }
+
+
+
+    private void SquadieTwoCoverReset()
+    {
+        if (prev_cover_squadie_two != null)
+        {
+            prev_cover_squadie_two.GetComponent<CoverPositions>().CoverInUseReset(squadie_two_pos_id);
+        }
     }
 
 

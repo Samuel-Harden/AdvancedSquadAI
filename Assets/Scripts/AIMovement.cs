@@ -79,6 +79,10 @@ public class AIMovement : MonoBehaviour
 
     public void FollowPlayer()
     {
+        target = formation_pos.position;
+        target.y = transform.position.y;
+        transform.LookAt(target);
+
         form_up = true;
     }
 

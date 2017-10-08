@@ -31,28 +31,45 @@ public class CoverPositions : MonoBehaviour
     
     public Vector3 GetPosition(Vector3 _order_position, ref int _pos_id)
     {
-        // Get distance of 1st position
-        float temp = Vector3.Distance(_order_position, cover_positions[0].position);
+        // Some Arbitrary number
+        float temp = 1000;
 
         int pos_id = 0;
 
-        for(int i = 0; i < cover_positions.Count; i++)
+        // Loop through positions
+        for (int i = 0; i < cover_positions.Count; i++)
         {
-            // if the last position is greater... we have a new waypoint (as its closer)
-            if (temp > (Vector3.Distance(_order_position, cover_positions[i].position)) && cover_positions_in_use[i] == false)
+            // if position is NOT in use
+            if(cover_positions_in_use[i] == false)
             {
+                // set the temp pos to be this position
                 temp = Vector3.Distance(_order_position, cover_positions[i].position);
 
-                // set this to be the new position
                 pos_id = i;
+            }
+        }
+        
+        // Now loop through all positions
+        for(int i = 0; i < cover_positions.Count; i++)
+        {
+            // is this position in use? skip if it is
+            if (cover_positions_in_use[i] == false)
+            {
+                // if the last position is greater... we have a new waypoint (as its closer)
+                if (temp > (Vector3.Distance(_order_position, cover_positions[i].position)))
+                {
+                    // set this to be the new position
+                    temp = Vector3.Distance(_order_position, cover_positions[i].position);
+                    pos_id = i;
+                }
             }
         }
 
         cover_positions_in_use[pos_id] = true;
 
-        _pos_id = pos_id;
-
         Debug.Log(pos_id);
+
+        _pos_id = pos_id;
 
         return cover_positions[pos_id].transform.position;
     }
@@ -61,6 +78,7 @@ public class CoverPositions : MonoBehaviour
     // Reset Cover in use
     public void CoverInUseReset(int _pos_id)
     {
+        Debug.Log("Reset");
         cover_positions_in_use[_pos_id] = false;
     }
 }
