@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class SquadPositionFollow : MonoBehaviour
 {
-    public GetTransform target;
+    public GameObject target;
 
     [SerializeField] float distance_to_target_min = 2.5f;
     [SerializeField] float distance_to_target_max = 10.0f;
@@ -24,9 +24,7 @@ public class SquadPositionFollow : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        target_pos = target.ReturnTransform().position;
-
-        transform.LookAt(target_pos);
+        target_pos = target.transform.position;
 
         if (Vector3.Distance(transform.position, target_pos) > distance_to_target_min)
         {

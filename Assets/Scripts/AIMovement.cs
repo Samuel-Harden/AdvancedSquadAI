@@ -26,6 +26,8 @@ public class AIMovement : MonoBehaviour
 
     Quaternion newRotation;
 
+    public float rotate_speed = 3.0f;
+
 
     // Use this for initialization
     void Start ()
@@ -47,6 +49,10 @@ public class AIMovement : MonoBehaviour
         if(form_up == true)
         {
             target = formation_pos.position;
+
+            //target.y = transform.position.y;
+
+            //transform.LookAt(target);
         }
 
         if (Vector3.Distance(this.gameObject.transform.position, target) > 0.5f)
@@ -60,6 +66,13 @@ public class AIMovement : MonoBehaviour
     {
         target = _pos;
         form_up = false;
+        /*
+        Vector3 direction = target - transform.position;
+        Quaternion to_rotation = Quaternion.FromToRotation(transform.forward, direction);
+        while (transform.rotation != to_rotation)
+            transform.rotation = Quaternion.Lerp(transform.rotation, to_rotation, rotate_speed * Time.deltaTime);*/
+        target.y = transform.position.y;
+        transform.LookAt(target);
     }
 
 
