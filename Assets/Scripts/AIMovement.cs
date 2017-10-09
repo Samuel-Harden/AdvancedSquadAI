@@ -49,10 +49,6 @@ public class AIMovement : MonoBehaviour
         if(form_up == true)
         {
             target = formation_pos.position;
-
-            //target.y = transform.position.y;
-
-            //transform.LookAt(target);
         }
 
         if (Vector3.Distance(this.gameObject.transform.position, target) > 0.5f)
@@ -66,11 +62,7 @@ public class AIMovement : MonoBehaviour
     {
         target = _pos;
         form_up = false;
-        /*
-        Vector3 direction = target - transform.position;
-        Quaternion to_rotation = Quaternion.FromToRotation(transform.forward, direction);
-        while (transform.rotation != to_rotation)
-            transform.rotation = Quaternion.Lerp(transform.rotation, to_rotation, rotate_speed * Time.deltaTime);*/
+
         target.y = transform.position.y;
         transform.LookAt(target);
     }
@@ -88,6 +80,19 @@ public class AIMovement : MonoBehaviour
 
 
 
+
+
+
+
+
+
+    /*
+Vector3 direction = target - transform.position;
+Quaternion to_rotation = Quaternion.FromToRotation(transform.forward, direction);
+while (transform.rotation != to_rotation)
+    transform.rotation = Quaternion.Lerp(transform.rotation, to_rotation, rotate_speed * Time.deltaTime);*/
+
+    /*
     public void Run(List<AIMovement> _squadies)
     {
         Squad(_squadies);
@@ -95,7 +100,7 @@ public class AIMovement : MonoBehaviour
     }
 
 
-
+    
     private void Squad(List<AIMovement> _squadies)
     {
         Vector3 sep = Seperate(_squadies); // seperation
@@ -277,6 +282,6 @@ public class AIMovement : MonoBehaviour
         //steer.limit (maxForce); // Limit to maximum steering force
         steer = Vector3.ClampMagnitude(steer, maxForce);
         return steer;
-    }
+    }*/
 
 }

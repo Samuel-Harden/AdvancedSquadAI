@@ -11,7 +11,7 @@ public class LevelGenerator : MonoBehaviour
 
     // Dictates Size of the City
     [SerializeField] int level_width = 10;
-    [SerializeField] int city_height = 10;
+    [SerializeField] int level_height = 10;
 
     //[SerializeField] int total_no_depots = 10;
 
@@ -30,11 +30,20 @@ public class LevelGenerator : MonoBehaviour
 
     private int[,] level_grid;
 
+    public int grid_section_size = 20;
+
 
     // Use this for initialization
     void Start()
     {
-        level_grid = new int[city_height, level_width];
+               
+    }
+
+
+
+    public void GenerateNewLevel()
+    {
+        level_grid = new int[level_height, level_width];
 
         GenerateLevelData();
 
@@ -47,7 +56,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void GenerateLevelData()
     {
-        for (int h = 0; h < city_height; h++)
+        for (int h = 0; h < level_height; h++)
         {
             for (int w = 0; w < level_width; w++)
             {
@@ -85,35 +94,35 @@ public class LevelGenerator : MonoBehaviour
         }
 
         // if this id is a left up section
-        if (w == 0 && h > 0 && h < (city_height - 1))
+        if (w == 0 && h > 0 && h < (level_height - 1))
         {
             level_grid[h, w] = level_left_up;
             return;
         }
 
         // if this id is a right up section
-        if (w == (level_width - 1) && h > 0 && h < (city_height - 1))
+        if (w == (level_width - 1) && h > 0 && h < (level_height - 1))
         {
             level_grid[h, w] = level_right_up;
             return;
         }
 
         // if this id the top left corner section
-        if (w == 0 && h == (city_height - 1))
+        if (w == 0 && h == (level_height - 1))
         {
             level_grid[h, w] = level_top_left_corner;
             return;
         }
 
         // if this id is a top across section
-        if (w > 0 && w < (level_width - 1) && h == (city_height - 1))
+        if (w > 0 && w < (level_width - 1) && h == (level_height - 1))
         {
             level_grid[h, w] = level_top_across;
             return;
         }
 
         // if this id is a top across section
-        if (w == (level_width - 1) && h == (city_height - 1))
+        if (w == (level_width - 1) && h == (level_height - 1))
         {
             level_grid[h, w] = level_top_right_corner;
             return;
@@ -137,7 +146,7 @@ public class LevelGenerator : MonoBehaviour
         while (depot_count < total_no_depots)
         {
             // 1 and -1 to exclude Edge Sections
-            h = Random.Range(1, city_height - 1);
+            h = Random.Range(1, level_height - 1);
 
             w = Random.Range(1, level_width - 1);
 
@@ -156,20 +165,20 @@ public class LevelGenerator : MonoBehaviour
     {
         Vector3 section_pos = Vector3.zero;
 
-        int section_size_w = 0;
-        int section_size_h = 0;
+        int section_pos_x = grid_section_size / 2;
+        int section_pos_z = grid_section_size / 2;
 
-        for (int h = 0; h < city_height; h++)
+        for (int h = 0; h < level_height; h++)
         {
             for (int w = 0; w < level_width; w++)
             {
                 int random_standard_section = Random.Range(0, standard_sections.Length);
                 //int random_depot_section = Random.Range(0, depot_sections.Length);
 
-                section_pos = new Vector3(section_size_w, 0.0f, section_size_h);
+                section_pos = new Vector3(section_pos_x, 0.0f, section_pos_z);
 
                 // if section is inner city
-                if (h > 0 && w > 0 && (h < city_height - 1) && (w < level_width - 1))
+                if (h > 0 && w > 0 && (h < level_height - 1) && (w < level_width - 1))
                 {
                     // Grid section
                     if (level_grid[h, w] == 0)
@@ -185,16 +194,16 @@ public class LevelGenerator : MonoBehaviour
                 }
 
                 // if this is an edge section
-                if (h == 0 || w == 0 || (h == city_height - 1) || (w == level_width - 1))
+                if (h == 0 || w == 0 || (h == level_height - 1) || (w == level_width - 1))
                 {
                     GenerateEdgeSection(h, w, section_pos);
                 }
 
-                section_size_w += 20;
+                section_pos_x += grid_section_size;
             }
 
-            section_size_w = 0;
-            section_size_h += 20;
+            section_pos_x = grid_section_size / 2;
+            section_pos_z += grid_section_size;
         }
     }
 
@@ -208,6 +217,13 @@ public class LevelGenerator : MonoBehaviour
                 Instantiate(edge_sections[i], section_pos, edge_sections[i].transform.rotation);
             }
         }
+    }
+
+
+
+    public Vector3 GetLevelSize()
+    {
+        return new Vector3(level_width * grid_section_size, 0.0f, level_height * grid_section_size);
     }
 }
 

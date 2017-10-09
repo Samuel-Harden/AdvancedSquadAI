@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerCommands : MonoBehaviour
+public class SquadCommands : MonoBehaviour
 {
     private Camera cam;
     public float max_command_distance = 20.0f;
@@ -10,7 +10,7 @@ public class PlayerCommands : MonoBehaviour
     public AIMovement squadie_one;
     public AIMovement squadie_two;
 
-    public SquadPositionFollow squad_pos_follow;
+    //public SquadPositionFollow squad_pos_follow;
 
     private GameObject prev_cover_squadie_one;
     private GameObject prev_cover_squadie_two;
@@ -41,12 +41,12 @@ public class PlayerCommands : MonoBehaviour
 
     void CommandInput()
     {
-        if (Input.GetButtonUp("SquadFormUp"))
+        if (Input.GetButtonDown("SquadFormUp"))
         {
             FollowCommand();
         }
 
-        if (Input.GetButtonUp("Squadie1Action") || Input.GetButtonUp("Squadie2Action") || Input.GetButtonUp("SquadAction"))
+        if (Input.GetButtonDown("Squadie1Action") || Input.GetButtonDown("Squadie2Action") || Input.GetButtonDown("SquadAction"))
         {
 
             RaycastHit hit;
@@ -55,6 +55,9 @@ public class PlayerCommands : MonoBehaviour
             // if the Ray hits something & is within range
             if (Physics.Raycast(ray, out hit) && CheckDistance(hit.point) == true)
             {
+                // Set TargetIndicator Hit Pos
+                SetTargetIndicator(hit.point);
+
                 // Identify object hit
                 if (hit.collider.tag == "Full Cover")
                 {
@@ -63,7 +66,7 @@ public class PlayerCommands : MonoBehaviour
 
                 else if (hit.collider.tag == "Low Cover")
                 {
-
+                    // Low Cover Commands to go here!
                 }
 
                 else if (hit.collider.tag == "Ground")
@@ -75,37 +78,37 @@ public class PlayerCommands : MonoBehaviour
     }
 
 
-
+    // When the Raycast has hit a 'Cover' Type object (Tag)
     private void CoverCommands(RaycastHit _hit)
     {
-        // Set TargetIndicator Hit Pos
-        SetTargetIndicator(_hit.point);
-
-        if (Input.GetButtonUp("Squadie1Action"))
+        if (Input.GetButtonDown("Squadie1Action"))
         {
             SquadieOneCoverReset();
             SquadieOneCoverOrder(_hit);
         }
 
-        else if (Input.GetButtonUp("Squadie2Action"))
+        else if (Input.GetButtonDown("Squadie2Action"))
         {
             SquadieTwoCoverReset();
             SquadieTwoCoverOrder(_hit);
         }
 
-        else if (Input.GetButtonUp("SquadAction"))
+        else if (Input.GetButtonDown("SquadAction"))
         {
             SquadieOneCoverReset();
             SquadieTwoCoverReset();
 
+            // Check Which Squad Memebr is closest
             if (Vector3.Distance(squadie_one.transform.position, _hit.point) < Vector3.Distance(squadie_two.transform.position, _hit.point))
             {
+                // If Squadie One is closest...
                 SquadieOneCoverOrder(_hit);
                 StartCoroutine(SquadieTwoCoverOrderDelay(_hit));
             }
 
             else
             {
+                // if Squadie Two is closest...
                 SquadieTwoCoverOrder(_hit);
                 StartCoroutine(SquadieOneCoverOrderDelay(_hit));
             }
@@ -136,23 +139,21 @@ public class PlayerCommands : MonoBehaviour
 
     private void MoveCommands(RaycastHit _hit)
     {
-        // Set TargetIndicator Hit Pos
-        SetTargetIndicator(_hit.point);
-
-        if (Input.GetButtonUp("Squadie1Action"))
+        if (Input.GetButtonDown("Squadie1Action"))
         {
             SquadieOneCoverReset();
             SquadieOneMoveOrder(_hit);
         }
 
-        else if (Input.GetButtonUp("Squadie2Action"))
+        else if (Input.GetButtonDown("Squadie2Action"))
         {
             SquadieTwoCoverReset();
             SquadieTwoMoveOrder(_hit);
         }
 
-        else if (Input.GetButtonUp("SquadAction"))
+        else if (Input.GetButtonDown("SquadAction"))
         {
+            Debug.Log("Cheese");
             SquadieOneCoverReset();
             SquadieTwoCoverReset();
 
@@ -237,7 +238,7 @@ public class PlayerCommands : MonoBehaviour
     }
 
 
-
+    // 
     private void SquadieOneCoverOrder(RaycastHit _hit)
     {
         // Set Squadie1 Move order
@@ -250,7 +251,7 @@ public class PlayerCommands : MonoBehaviour
 
     private void SquadieTwoCoverOrder(RaycastHit _hit)
     {
-        // Set Squadie1 Move order
+        // Set Squadie2 Move order
         SquadMemberMoveOrder(squadie_two, _hit.collider.gameObject.GetComponent<CoverPositions>().GetPosition(_hit.point, ref squadie_two_pos_id));
 
         // Create Reference to previous Cover Object
@@ -324,6 +325,7 @@ public class PlayerCommands : MonoBehaviour
     }
 
 
+    // Move Squadie to given position
     void SquadMemberMoveOrder(AIMovement _squadie, Vector3 _position)
     {
         _squadie.MoveOrder(_position);

@@ -80,11 +80,12 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\AIMovement.cs" />
     <Compile Include="Assets\Scripts\CameraMouseLook.cs" />
+    <Compile Include="Assets\Scripts\CoverGenerator.cs" />
     <Compile Include="Assets\Scripts\CoverPositions.cs" />
+    <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\LevelGenerator.cs" />
-    <Compile Include="Assets\Scripts\PlayerCommands.cs" />
     <Compile Include="Assets\Scripts\PlayerMovement.cs" />
-    <Compile Include="Assets\Scripts\SquadManager.cs" />
+    <Compile Include="Assets\Scripts\SquadCommands.cs" />
     <Compile Include="Assets\Scripts\SquadPositionFollow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
