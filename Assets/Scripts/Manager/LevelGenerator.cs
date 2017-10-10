@@ -10,8 +10,8 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField] GameObject[] edge_sections;
 
     // Dictates Size of the City
-    [SerializeField] int level_width = 10;
-    [SerializeField] int level_height = 10;
+    private int level_width = 10;
+    private int level_height = 10;
 
     //[SerializeField] int total_no_depots = 10;
 
@@ -30,7 +30,7 @@ public class LevelGenerator : MonoBehaviour
 
     private int[,] level_grid;
 
-    public int grid_section_size = 20;
+    private int grid_section_size = 0;
 
 
     // Use this for initialization
@@ -41,8 +41,12 @@ public class LevelGenerator : MonoBehaviour
 
 
 
-    public void GenerateNewLevel()
+    public void GenerateNewLevel(int _level_height, int _level_width, int _grid_section_size)
     {
+        level_width = _level_width;
+        level_height = _level_height;
+        grid_section_size = _grid_section_size;
+
         level_grid = new int[level_height, level_width];
 
         GenerateLevelData();
@@ -217,13 +221,6 @@ public class LevelGenerator : MonoBehaviour
                 Instantiate(edge_sections[i], section_pos, edge_sections[i].transform.rotation);
             }
         }
-    }
-
-
-
-    public Vector3 GetLevelSize()
-    {
-        return new Vector3(level_width * grid_section_size, 0.0f, level_height * grid_section_size);
     }
 }
 

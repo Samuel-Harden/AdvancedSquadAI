@@ -78,15 +78,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\AIMovement.cs" />
-    <Compile Include="Assets\Scripts\CameraMouseLook.cs" />
-    <Compile Include="Assets\Scripts\CoverGenerator.cs" />
-    <Compile Include="Assets\Scripts\CoverPositions.cs" />
-    <Compile Include="Assets\Scripts\GameManager.cs" />
-    <Compile Include="Assets\Scripts\LevelGenerator.cs" />
-    <Compile Include="Assets\Scripts\PlayerMovement.cs" />
-    <Compile Include="Assets\Scripts\SquadCommands.cs" />
-    <Compile Include="Assets\Scripts\SquadPositionFollow.cs" />
+    <Compile Include="Assets\Scripts OLD\AIMovement.cs" />
+    <Compile Include="Assets\Scripts OLD\CoverGenerator.cs" />
+    <Compile Include="Assets\Scripts OLD\CoverPositions.cs" />
+    <Compile Include="Assets\Scripts\AI\SquadPositionFollow.cs" />
+    <Compile Include="Assets\Scripts\Manager\CoverManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\LevelGenerator.cs" />
+    <Compile Include="Assets\Scripts\Manager\SquadManager.cs" />
+    <Compile Include="Assets\Scripts\Player\CameraMouseLook.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
+    <Compile Include="Assets\Scripts\Player\SquadCommands.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
