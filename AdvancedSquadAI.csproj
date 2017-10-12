@@ -81,11 +81,12 @@
     <Compile Include="Assets\Scripts OLD\AIMovement.cs" />
     <Compile Include="Assets\Scripts OLD\CoverGenerator.cs" />
     <Compile Include="Assets\Scripts OLD\CoverPositions.cs" />
+    <Compile Include="Assets\Scripts OLD\SquadManager.cs" />
     <Compile Include="Assets\Scripts\AI\SquadPositionFollow.cs" />
     <Compile Include="Assets\Scripts\Manager\CoverManager.cs" />
     <Compile Include="Assets\Scripts\Manager\GameManager.cs" />
     <Compile Include="Assets\Scripts\Manager\LevelGenerator.cs" />
-    <Compile Include="Assets\Scripts\Manager\SquadManager.cs" />
+    <Compile Include="Assets\Scripts\Manager\SquadGenerator.cs" />
     <Compile Include="Assets\Scripts\Player\CameraMouseLook.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\Player\SquadCommands.cs" />

@@ -5,6 +5,7 @@ using UnityEngine;
 public class CoverManager : MonoBehaviour
 {
     public GameObject temp_object;
+    public bool test_cover_pos_markers = false;
 
     private List<Vector3> cover_positions;
 
@@ -75,7 +76,11 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 'cover spacing' away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        Instantiate(temp_object, new Vector3(hit.point.x, hit.point.y, (hit.point.z - nav_mesh_offset)), temp_object.transform.rotation);
+                        if(test_cover_pos_markers == true)
+                        {
+                            Instantiate(temp_object, new Vector3(hit.point.x, hit.point.y, (hit.point.z - nav_mesh_offset)), temp_object.transform.rotation);
+                        }
+
 
                         cover_positions.Add(new Vector3(hit.point.x, hit.point.y, (hit.point.z - nav_mesh_offset)));
 
@@ -126,7 +131,11 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 0.5 away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        Instantiate(temp_object, new Vector3(hit.point.x, hit.point.y, (hit.point.z + nav_mesh_offset)), temp_object.transform.rotation);
+                        if (test_cover_pos_markers == true)
+                        {
+                            Instantiate(temp_object, new Vector3(hit.point.x, hit.point.y, (hit.point.z + nav_mesh_offset)), temp_object.transform.rotation);
+                        }
+                        
 
                         cover_positions.Add(new Vector3(hit.point.x, hit.point.y, (hit.point.z + nav_mesh_offset)));
 
@@ -177,7 +186,10 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 0.5 away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        Instantiate(temp_object, new Vector3((hit.point.x - 0.5f), hit.point.y, hit.point.z), temp_object.transform.rotation);
+                        if (test_cover_pos_markers == true)
+                        {
+                            Instantiate(temp_object, new Vector3((hit.point.x - 0.5f), hit.point.y, hit.point.z), temp_object.transform.rotation);
+                        }
 
                         cover_positions.Add(new Vector3((hit.point.x - 0.5f), hit.point.y, hit.point.z));
 
@@ -228,7 +240,10 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 0.5 away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        Instantiate(temp_object, new Vector3((hit.point.x + 0.5f), hit.point.y, hit.point.z), temp_object.transform.rotation);
+                        if (test_cover_pos_markers == true)
+                        {
+                            Instantiate(temp_object, new Vector3((hit.point.x + 0.5f), hit.point.y, hit.point.z), temp_object.transform.rotation);
+                        }
 
                         cover_positions.Add(new Vector3((hit.point.x + 0.5f), hit.point.y, hit.point.z));
 
@@ -246,13 +261,17 @@ public class CoverManager : MonoBehaviour
 
 
 
-    public List<Vector3> StartupCover(int _no_positions, Vector3 _player_pos)
+    public List<Vector3> StartupCover(int _no_positions, ref List<int> _squad_one_pos_ids, ref List<int> _squad_two_pos_ids, Vector3 _player_pos)
     {
         List<Vector3> start_cover_positions = new List<Vector3>();
 
         float temp_pos = 1000.0f;
 
         int pos_id = 0;
+
+        int squad_no = 0;
+        int squad_one_pos = 0;
+        int squad_two_pos = 0;
 
         // find a position for each squad member
         for (int i = 0; i < _no_positions; i++)
@@ -272,7 +291,18 @@ public class CoverManager : MonoBehaviour
                     }
                 }
             }
-            Debug.Log("Position: " + pos_id);
+
+            if (squad_no < _no_positions / 2)
+            {
+                _squad_one_pos_ids[squad_one_pos] = pos_id;
+                squad_one_pos++;
+            }
+
+            else
+            {
+                _squad_two_pos_ids[squad_two_pos] = pos_id;
+                squad_two_pos++;
+            }
 
             cover_positions_in_use[pos_id] = true;
 
@@ -281,7 +311,10 @@ public class CoverManager : MonoBehaviour
             // RESET VARIABLES
             pos_id = 0;
             temp_pos = 1000.0f;
+
+            squad_no++;
         }
+
         return start_cover_positions;
     }
 }

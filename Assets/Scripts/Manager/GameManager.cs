@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     private LevelGenerator level_generator;
     private CoverManager cover_manager;
-    private SquadManager squad_manager;
+    private SquadGenerator squad_generator;
 
 
     public GameObject player;
@@ -23,14 +23,20 @@ public class GameManager : MonoBehaviour
 
     // Squad Generation Variables
     public int no_of_squad_members = 0;
-        
 
-	// Use this for initialization
-	void Start ()
+    private List<int> squad_one_position_ids;
+    private List<int> squad_two_position_ids;
+
+
+    // Use this for initialization
+    void Start ()
     {
         level_generator = gameObject.GetComponent<LevelGenerator>();
-        cover_manager = gameObject.GetComponent<CoverManager>();
-        squad_manager = gameObject.GetComponent<SquadManager>();
+        cover_manager   = gameObject.GetComponent<CoverManager>();
+        squad_generator = gameObject.GetComponent<SquadGenerator>();
+
+        squad_one_position_ids = new List<int>();
+        squad_two_position_ids = new List<int>();
 
         level_generator.GenerateNewLevel(level_height, level_width, grid_section_size);
 
@@ -39,13 +45,19 @@ public class GameManager : MonoBehaviour
         cover_manager.GenerateCoverPoints(level_size, no_cover_passes_across, no_cover_passes_up, cover_spacing);
 
         // Set Player position
-        player.transform.position = new Vector3(30.0f, 0.0f, 30.0f);
+        //player.transform.position = new Vector3(30.0f, 0.0f, 30.0f);
 
         // Generate Squad
         if (no_of_squad_members > 6)
             no_of_squad_members = 6;
 
-        squad_manager.GenerateSquad(no_of_squad_members, cover_manager.StartupCover(no_of_squad_members, player.transform.position));
+        // Position ID's
+        SetSquads();
+
+        squad_generator.GenerateSquad(no_of_squad_members, cover_manager.StartupCover(no_of_squad_members,
+            ref squad_one_position_ids,
+            ref squad_two_position_ids,
+            player.transform.position));
     }
 	
 	// Update is called once per frame
@@ -53,4 +65,20 @@ public class GameManager : MonoBehaviour
     {
 		
 	}
+
+
+
+    void SetSquads()
+    {
+        for(int i = 0; i < no_of_squad_members/2; i++)
+        {
+            squad_one_position_ids.Add(0);
+
+        }
+
+        for (int i = no_of_squad_members/2; i < no_of_squad_members; i++)
+        {
+            squad_two_position_ids.Add(0);
+        }
+    }
 }
