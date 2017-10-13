@@ -11,6 +11,9 @@ public class CoverManager : MonoBehaviour
 
     private List<bool> cover_positions_in_use;
 
+    private List<int> squad_one_position_ids;
+    private List<int> squad_two_position_ids;
+
     private int no_cover_passes_across = 0;
     private int no_cover_passes_up = 0;
     private float nav_mesh_offset = 0.5f;
@@ -22,6 +25,9 @@ public class CoverManager : MonoBehaviour
     {
         cover_positions = new List<Vector3>();
         cover_positions_in_use = new List<bool>();
+
+        squad_one_position_ids = new List<int>();
+        squad_two_position_ids = new List<int>();
     }
 
 
@@ -261,7 +267,7 @@ public class CoverManager : MonoBehaviour
 
 
 
-    public List<Vector3> StartupCover(int _no_positions, ref List<int> _squad_one_pos_ids, ref List<int> _squad_two_pos_ids, Vector3 _player_pos)
+    public List<Vector3> StartupCover(int _no_positions, Vector3 _player_pos)
     {
         List<Vector3> start_cover_positions = new List<Vector3>();
 
@@ -294,13 +300,13 @@ public class CoverManager : MonoBehaviour
 
             if (squad_no < _no_positions / 2)
             {
-                _squad_one_pos_ids[squad_one_pos] = pos_id;
+                squad_one_position_ids[squad_one_pos] = pos_id;
                 squad_one_pos++;
             }
 
             else
             {
-                _squad_two_pos_ids[squad_two_pos] = pos_id;
+                squad_two_position_ids[squad_two_pos] = pos_id;
                 squad_two_pos++;
             }
 
@@ -316,5 +322,107 @@ public class CoverManager : MonoBehaviour
         }
 
         return start_cover_positions;
+    }
+
+
+
+    public void SetSquads(int _no_of_squad_members)
+    {
+        for (int i = 0; i < _no_of_squad_members / 2; i++)
+        {
+            squad_one_position_ids.Add(0);
+        }
+
+        for (int i = _no_of_squad_members / 2; i < _no_of_squad_members; i++)
+        {
+            squad_two_position_ids.Add(0);
+        }
+    }
+
+
+
+    public void ClearSquadPositions(int _squad)
+    {
+        if (_squad == 1)
+        {
+            for(int i = 0; i < squad_one_position_ids.Count; i++)
+            {
+                cover_positions_in_use[squad_one_position_ids[i]] = false;
+            }
+        }
+
+        if (_squad == 2)
+        {
+            for (int i = 0; i < squad_two_position_ids.Count; i++)
+            {
+                cover_positions_in_use[squad_two_position_ids[i]] = false;
+            }
+        }
+    }
+
+
+
+    public List<Vector3> GetSquadPositions(RaycastHit _hit, int _squad)
+    {
+        List<Vector3> squad_new_positions = new List<Vector3>();
+
+        int no_positions = 0;
+
+        if (_squad == 1)
+        {
+            no_positions = squad_one_position_ids.Count;
+        }
+
+        if (_squad == 2)
+        {
+            no_positions = squad_two_position_ids.Count;
+        }
+
+        float temp_pos = 1000.0f;
+
+        int pos_id = 0;
+        int squad_pos = 0;
+
+        // find a position for each squad member
+        for (int i = 0; i < no_positions; i++)
+        {
+            // check through all positions
+            for (int j = 0; j < cover_positions.Count; j++)
+            {
+                // If this position is available?
+                if (cover_positions_in_use[j] == false)
+                {
+                    // if the position is closer
+                    if (temp_pos > (Vector3.Distance(_hit.point, cover_positions[j])))
+                    {
+                        temp_pos = Vector3.Distance(_hit.point, cover_positions[j]);
+
+                        pos_id = j;
+                    }
+                }
+            }
+
+            if (_squad == 1)
+            {
+                squad_one_position_ids[squad_pos] = pos_id;
+                squad_pos++;
+            }
+
+            if (_squad == 2)
+            {
+                squad_two_position_ids[squad_pos] = pos_id;
+                squad_pos++;
+            }
+
+            cover_positions_in_use[pos_id] = true;
+
+            squad_new_positions.Add(cover_positions[pos_id]);
+
+            // RESET VARIABLES
+            pos_id = 0;
+            temp_pos = 1000.0f;
+        }
+
+        return squad_new_positions;
     }
 }

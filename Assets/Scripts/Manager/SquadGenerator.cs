@@ -7,20 +7,7 @@ public class SquadGenerator : MonoBehaviour
     public SquadCommands squad_commands;
     public GameObject squad_member_prefab;
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-
-
+    // Script simply Generates Squad Members and assigns them to a Squad
     public void GenerateSquad(int _no_squad_members, List<Vector3> _squad_positions)
     {
 
