@@ -30,11 +30,11 @@ public class SquadManager : MonoBehaviour
 
             if (i < _no_squad_members / 2)
             {
-                squad_commands.AddSquadieToSquadOne(squadie.gameObject.GetComponent<AIMovement>());
+                squad_commands.AddSquadieToSquadOne(squadie.gameObject.GetComponent<AIController>());
             }
 
             else
-                squad_commands.AddSquadieToSquadTwo(squadie.gameObject.GetComponent<AIMovement>());
+                squad_commands.AddSquadieToSquadTwo(squadie.gameObject.GetComponent<AIController>());
         }
     }
 }

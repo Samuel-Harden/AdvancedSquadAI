@@ -5,8 +5,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     private LevelGenerator level_generator;
-    private CoverManager cover_manager;
+    private CoverManager   cover_manager;
     private SquadGenerator squad_generator;
+    private EnemyGenerator enemy_generator;
 
 
     public GameObject player;
@@ -24,6 +25,8 @@ public class GameManager : MonoBehaviour
     // Squad Generation Variables
     public int no_of_squad_members = 0;
 
+    private int no_of_enemies = 0;
+
 
     // Use this for initialization
     void Start ()
@@ -31,6 +34,9 @@ public class GameManager : MonoBehaviour
         level_generator = gameObject.GetComponent<LevelGenerator>();
         cover_manager   = gameObject.GetComponent<CoverManager>();
         squad_generator = gameObject.GetComponent<SquadGenerator>();
+        enemy_generator = gameObject.GetComponent<EnemyGenerator>();
+
+        no_of_enemies = no_of_squad_members * 2;
 
         level_generator.GenerateNewLevel(level_height, level_width, grid_section_size);
 
@@ -42,13 +48,15 @@ public class GameManager : MonoBehaviour
         //player.transform.position = new Vector3(30.0f, 0.0f, 30.0f);
 
         // Generate Squad
-        //if (no_of_squad_members > 6)
-            //no_of_squad_members = 6;
+        if (no_of_squad_members > 8)
+            no_of_squad_members = 8;
 
         // Position ID's
         cover_manager.SetSquads(no_of_squad_members);
 
         squad_generator.GenerateSquad(no_of_squad_members, cover_manager.StartupCover(no_of_squad_members, player.transform.position));
+
+        enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()));
     }
 	
 	// Update is called once per frame

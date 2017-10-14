@@ -10,8 +10,8 @@ public class SquadCommands : MonoBehaviour
     public float max_command_distance = 20.0f;
     public GameObject target_indicator;
 
-    private List<AIMovement> squad_one;
-    private List<AIMovement> squad_two;
+    private List<AIController> squad_one;
+    private List<AIController> squad_two;
 
     public CoverManager cover_manager;
 
@@ -24,8 +24,8 @@ public class SquadCommands : MonoBehaviour
     {
         distance = 0.0f;
         cam = GetComponent<Camera>();
-        squad_one = new List<AIMovement>();
-        squad_two = new List<AIMovement>();
+        squad_one = new List<AIController>();
+        squad_two = new List<AIController>();
     }
 
 
@@ -57,10 +57,12 @@ public class SquadCommands : MonoBehaviour
                 // Set TargetIndicator Hit Pos
                 SetTargetIndicator(hit.point);
 
+                Vector3 hit_ground = new Vector3(hit.point.x, 0.0f, hit.point.z);
+
                 // Identify object hit
-                if (hit.collider.tag == "Full Cover")
+                if (hit.collider.tag == "Full Cover" || hit.collider.tag == "Low Cover")
                 {
-                    CoverCommands(hit);
+                    CoverCommands(hit_ground);
                 }
 
                 else if (hit.collider.tag == "Low Cover")
@@ -70,7 +72,7 @@ public class SquadCommands : MonoBehaviour
 
                 else if (hit.collider.tag == "Ground")
                 {
-                    MoveCommands(hit);
+                    MoveCommands(hit_ground);
                 }
             }
         }
@@ -78,7 +80,7 @@ public class SquadCommands : MonoBehaviour
 
 
     // When the Raycast has hit a 'Cover' Type object (Tag)
-    private void CoverCommands(RaycastHit _hit)
+    private void CoverCommands(Vector3 _hit)
     {
         if (Input.GetButtonDown("SquadOneAction"))
         {
@@ -102,12 +104,12 @@ public class SquadCommands : MonoBehaviour
 
             for (int i = 0; i < squad_one.Count; i++)
             {
-                squad_one_avg_dist += Vector3.Distance(squad_one[i].GetComponent<Transform>().position, _hit.point);
+                squad_one_avg_dist += Vector3.Distance(squad_one[i].GetComponent<Transform>().position, _hit);
             }
 
             for (int i = 0; i < squad_two.Count; i++)
             {
-                squad_two_avg_dist += Vector3.Distance(squad_two[i].GetComponent<Transform>().position, _hit.point);
+                squad_two_avg_dist += Vector3.Distance(squad_two[i].GetComponent<Transform>().position, _hit);
             }
 
             // Check Which Squad Memebr is closest
@@ -162,7 +164,7 @@ public class SquadCommands : MonoBehaviour
 
 
 
-    private void MoveCommands(RaycastHit _hit)
+    private void MoveCommands(Vector3 _hit)
     {
         if (Input.GetButtonDown("SquadOneAction"))
         {
@@ -186,12 +188,12 @@ public class SquadCommands : MonoBehaviour
 
             for (int i = 0; i < squad_one.Count; i++)
             {
-                squad_one_avg_dist += Vector3.Distance(squad_one[i].GetComponent<Transform>().position, _hit.point);
+                squad_one_avg_dist += Vector3.Distance(squad_one[i].GetComponent<Transform>().position, _hit);
             }
 
             for (int i = 0; i < squad_two.Count; i++)
             {
-                squad_two_avg_dist += Vector3.Distance(squad_two[i].GetComponent<Transform>().position, _hit.point);
+                squad_two_avg_dist += Vector3.Distance(squad_two[i].GetComponent<Transform>().position, _hit);
             }
 
             if (squad_one_avg_dist < squad_two_avg_dist)
@@ -212,13 +214,13 @@ public class SquadCommands : MonoBehaviour
 
 
 
-    private void SquadMoveOrder(RaycastHit _hit, int _squad)
+    private void SquadMoveOrder(Vector3 _hit, int _squad)
     {
         if (_squad == 1)
         {
             for (int i = 0; i < squad_one.Count; i++)
             {
-                squad_one[i].MoveOrder(_hit.point);
+                squad_one[i].MoveOrder(_hit);
             }
         }
 
@@ -226,14 +228,14 @@ public class SquadCommands : MonoBehaviour
         {
             for (int i = 0; i < squad_two.Count; i++)
             {
-                squad_two[i].MoveOrder(_hit.point);
+                squad_two[i].MoveOrder(_hit);
             }
         }
     }
 
 
     // SAME FUNCTION AS ABOVE, JUST WITH A DELAY
-    private IEnumerator SquadMoveOrderDelay(RaycastHit _hit, int _squad)
+    private IEnumerator SquadMoveOrderDelay(Vector3 _hit, int _squad)
     {
         yield return new WaitForSeconds(1);
 
@@ -241,7 +243,7 @@ public class SquadCommands : MonoBehaviour
         {
             for (int i = 0; i < squad_one.Count; i++)
             {
-                squad_one[i].MoveOrder(_hit.point);
+                squad_one[i].MoveOrder(_hit);
             }
         }
 
@@ -249,7 +251,7 @@ public class SquadCommands : MonoBehaviour
         {
             for (int i = 0; i < squad_two.Count; i++)
             {
-                squad_two[i].MoveOrder(_hit.point);
+                squad_two[i].MoveOrder(_hit);
             }
         }
     }
@@ -300,7 +302,7 @@ public class SquadCommands : MonoBehaviour
 
 
  
-    private void SquadGetCover(RaycastHit _hit, int _squad)
+    private void SquadGetCover(Vector3 _hit, int _squad)
     {
         // Set Squad Move order
         SquadMoveToCover(cover_manager.GetSquadPositions(_hit, _squad), _squad);
@@ -308,7 +310,7 @@ public class SquadCommands : MonoBehaviour
 
 
 
-    private IEnumerator SquadGetCoverDelay(RaycastHit _hit, int _squad)
+    private IEnumerator SquadGetCoverDelay(Vector3 _hit, int _squad)
     {
         yield return new WaitForSeconds(1);
 
@@ -360,7 +362,7 @@ public class SquadCommands : MonoBehaviour
         {
             for(int i = 0; i < squad_one.Count; i++)
             {
-                squad_one[i].MoveOrder(_positions[i]);
+                squad_one[i].CoverOrder(_positions[i]);
             }
         }
 
@@ -368,21 +370,21 @@ public class SquadCommands : MonoBehaviour
         {
             for (int i = 0; i < squad_two.Count; i++)
             {
-                squad_two[i].MoveOrder(_positions[i]);
+                squad_two[i].CoverOrder(_positions[i]);
             }
         }
     }
 
 
     // Called from Squad Generator to add members to squads
-    public void AddSquadieToSquadOne(AIMovement _squadie)
+    public void AddSquadieToSquadOne(AIController _squadie)
     {
         squad_one.Add(_squadie);
     }
 
 
     // Called from Squad Generator to add members to squads
-    public void AddSquadieToSquadTwo(AIMovement _squadie)
+    public void AddSquadieToSquadTwo(AIController _squadie)
     {
         squad_two.Add(_squadie);
     }

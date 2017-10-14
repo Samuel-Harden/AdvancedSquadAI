@@ -362,7 +362,7 @@ public class CoverManager : MonoBehaviour
 
 
 
-    public List<Vector3> GetSquadPositions(RaycastHit _hit, int _squad)
+    public List<Vector3> GetSquadPositions(Vector3 _hit, int _squad)
     {
         List<Vector3> squad_new_positions = new List<Vector3>();
 
@@ -393,9 +393,9 @@ public class CoverManager : MonoBehaviour
                 if (cover_positions_in_use[j] == false)
                 {
                     // if the position is closer
-                    if (temp_pos > (Vector3.Distance(_hit.point, cover_positions[j])))
+                    if (temp_pos > (Vector3.Distance(_hit, cover_positions[j])))
                     {
-                        temp_pos = Vector3.Distance(_hit.point, cover_positions[j]);
+                        temp_pos = Vector3.Distance(_hit, cover_positions[j]);
 
                         pos_id = j;
                     }
@@ -424,5 +424,53 @@ public class CoverManager : MonoBehaviour
         }
 
         return squad_new_positions;
+    }
+
+
+
+    public List<Vector3> GetEnemyPositions(int _no_positions, List<Transform> _spawn_points)
+    {
+        List<Vector3> enemy_cover_positions = new List<Vector3>();
+        
+        float temp_pos = 1000.0f;
+
+        int pos_id = 0;
+
+        int k = 0;
+
+        for (int i = 0; i < _no_positions; i++)
+        {
+            // check through all positions
+            for (int j = 0; j < cover_positions.Count; j++)
+            {
+                // If this position is available?
+                if (cover_positions_in_use[j] == false)
+                {
+                    // if the position is closer
+                    if (temp_pos > (Vector3.Distance(_spawn_points[k].position, cover_positions[j])))
+                    {
+                        temp_pos = Vector3.Distance(_spawn_points[k].position, cover_positions[j]);
+
+                        pos_id = j;
+                    }
+                }
+            }
+
+            cover_positions_in_use[pos_id] = true;
+
+            enemy_cover_positions.Add(cover_positions[pos_id]);
+
+            // RESET VARIABLES
+            pos_id = 0;
+            temp_pos = 1000.0f;
+
+            k++;
+
+            if (k == _spawn_points.Count)
+            {
+                k = 0;
+            }
+        }
+        return enemy_cover_positions;
     }
 }
