@@ -11,6 +11,9 @@ public class CoverManager : MonoBehaviour
 
     private List<bool> cover_positions_in_use;
 
+    private List<bool> cover_positions_unsafe_squadies;
+    private List<bool> cover_positions_unsafe_enemies;
+
     private List<int> squad_one_position_ids;
     private List<int> squad_two_position_ids;
 
@@ -18,6 +21,10 @@ public class CoverManager : MonoBehaviour
     private int no_cover_passes_up = 0;
     private float nav_mesh_offset = 0.5f;
     private float cover_spacing = 0.0f;
+
+    public LayerMask squadie_mask;
+    public LayerMask enemy_mask;
+    public LayerMask obstacle_mask;
 
     public RaycastHit[] hits;
 
@@ -28,6 +35,9 @@ public class CoverManager : MonoBehaviour
 
         squad_one_position_ids = new List<int>();
         squad_two_position_ids = new List<int>();
+
+        cover_positions_unsafe_squadies = new List<bool>();
+        cover_positions_unsafe_enemies = new List<bool>();
     }
 
 
@@ -45,6 +55,14 @@ public class CoverManager : MonoBehaviour
         GetPositionsZXRight(_level_dimentions);
 
         GetPositionsZXLeft(_level_dimentions);
+
+        for(int i = 0; i < cover_positions.Count; i++)
+        {
+            if (test_cover_pos_markers == true)
+            {
+                Instantiate(temp_object, cover_positions[i], temp_object.transform.rotation);
+            }
+        }
     }
 
 
@@ -82,15 +100,12 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 'cover spacing' away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        if(test_cover_pos_markers == true)
-                        {
-                            Instantiate(temp_object, new Vector3(hit.point.x, hit.point.y, (hit.point.z - nav_mesh_offset)), temp_object.transform.rotation);
-                        }
-
-
                         cover_positions.Add(new Vector3(hit.point.x, hit.point.y, (hit.point.z - nav_mesh_offset)));
 
                         cover_positions_in_use.Add(false);
+
+                        cover_positions_unsafe_squadies.Add(false);
+                        cover_positions_unsafe_enemies.Add(false);
                     }
                 }
 
@@ -137,15 +152,12 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 0.5 away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        if (test_cover_pos_markers == true)
-                        {
-                            Instantiate(temp_object, new Vector3(hit.point.x, hit.point.y, (hit.point.z + nav_mesh_offset)), temp_object.transform.rotation);
-                        }
-                        
-
                         cover_positions.Add(new Vector3(hit.point.x, hit.point.y, (hit.point.z + nav_mesh_offset)));
 
                         cover_positions_in_use.Add(false);
+
+                        cover_positions_unsafe_squadies.Add(false);
+                        cover_positions_unsafe_enemies.Add(false);
                     }
                 }
 
@@ -192,14 +204,12 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 0.5 away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        if (test_cover_pos_markers == true)
-                        {
-                            Instantiate(temp_object, new Vector3((hit.point.x - 0.5f), hit.point.y, hit.point.z), temp_object.transform.rotation);
-                        }
-
                         cover_positions.Add(new Vector3((hit.point.x - 0.5f), hit.point.y, hit.point.z));
 
                         cover_positions_in_use.Add(false);
+
+                        cover_positions_unsafe_squadies.Add(false);
+                        cover_positions_unsafe_enemies.Add(false);
                     }
                 }
 
@@ -246,14 +256,12 @@ public class CoverManager : MonoBehaviour
                     // Once we have closest position, as long as its further than 0.5 away, we can set this as a cover spot
                     if (closest_position >= cover_spacing)
                     {
-                        if (test_cover_pos_markers == true)
-                        {
-                            Instantiate(temp_object, new Vector3((hit.point.x + 0.5f), hit.point.y, hit.point.z), temp_object.transform.rotation);
-                        }
-
                         cover_positions.Add(new Vector3((hit.point.x + 0.5f), hit.point.y, hit.point.z));
 
                         cover_positions_in_use.Add(false);
+
+                        cover_positions_unsafe_squadies.Add(false);
+                        cover_positions_unsafe_enemies.Add(false);
                     }
                 }
 
@@ -365,8 +373,9 @@ public class CoverManager : MonoBehaviour
     public List<Vector3> GetSquadPositions(Vector3 _hit, int _squad)
     {
         List<Vector3> squad_new_positions = new List<Vector3>();
+        List<Transform> visible_targets = new List<Transform>();
 
-        int no_positions = 0;
+    int no_positions = 0;
 
         if (_squad == 1)
         {
@@ -383,6 +392,8 @@ public class CoverManager : MonoBehaviour
         int pos_id = 0;
         int squad_pos = 0;
 
+        bool visible = false;
+
         // find a position for each squad member
         for (int i = 0; i < no_positions; i++)
         {
@@ -395,9 +406,39 @@ public class CoverManager : MonoBehaviour
                     // if the position is closer
                     if (temp_pos > (Vector3.Distance(_hit, cover_positions[j])))
                     {
-                        temp_pos = Vector3.Distance(_hit, cover_positions[j]);
+                        //BROKE IN HERE SOMEWHERE?!?
 
-                        pos_id = j;
+                        // IF THIS POSITION IS SAFE IE AN ENEMY CANT SEE IT
+
+                        // Create a list of enemies in range of this position
+                        Collider[] enemys_in_range = Physics.OverlapSphere(cover_positions[j], 20, enemy_mask);
+
+                        // loop through them to see which can be seen
+                        for (int k = 0; k < enemys_in_range.Length; k++)
+                        {
+                            Transform enemy = enemys_in_range[k].transform;
+
+                            Vector3 dir_to_target = (enemy.position - cover_positions[j]).normalized;
+                                float dist_to_target = Vector3.Distance(cover_positions[j], enemy.position);
+
+                            // Can the enemy see this position?
+                            if (!Physics.Raycast(cover_positions[j], dir_to_target, dist_to_target, obstacle_mask))
+                            {
+                                visible = true;
+                                break;
+                            }
+                        }
+
+                        // if the position is safe
+                        if (visible == false)
+                        {
+                            temp_pos = Vector3.Distance(_hit, cover_positions[j]);
+
+                            pos_id = j;
+                        }
+
+                        // Reset Visible Variable ready for next position
+                        visible = false;
                     }
                 }
             }

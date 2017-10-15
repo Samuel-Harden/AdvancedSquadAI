@@ -6,21 +6,7 @@ public class EnemyGenerator : MonoBehaviour
 {
     public GameObject enemy_prefab;
 
-    private List<Transform> spawn_positions;
-
-	void Start ()
-    {
-        spawn_positions = new List<Transform>();
-
-        var spawn_points = GameObject.FindGameObjectsWithTag("Enemy Spawn Point");
-
-        foreach(GameObject spawn_point in spawn_points)
-        {
-            spawn_positions.Add(spawn_point.transform);
-        }
-	}
-	
-
+    private List<Transform> spawn_positions;	
 
 	// Update is called once per frame
 	void Update ()
@@ -42,6 +28,15 @@ public class EnemyGenerator : MonoBehaviour
 
     public List<Transform> GetSpawnPoints()
     {
+        spawn_positions = new List<Transform>();
+
+        var spawn_points = GameObject.FindGameObjectsWithTag("Enemy Spawn Point");
+
+        foreach (GameObject spawn_point in spawn_points)
+        {
+            spawn_positions.Add(spawn_point.transform);
+        }
+
         return spawn_positions;
     }
 }
