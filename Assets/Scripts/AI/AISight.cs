@@ -17,21 +17,9 @@ public class AISight : MonoBehaviour
 
     public CoverManager cover_manager;
 
-    private string my_tag;
-
 	// Use this for initialization
 	void Start ()
     {
-        if (this.gameObject.tag == "Enemy")
-        {
-            my_tag = "Enemy";
-        }
-
-        else if(this.gameObject.tag == "Squadie")
-        {
-            my_tag = "Squadie";
-        }
-
         StartCoroutine("FindTargetsWithDelay", .2f);
 	}
 	

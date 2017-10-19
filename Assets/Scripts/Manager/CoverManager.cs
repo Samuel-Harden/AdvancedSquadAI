@@ -334,14 +334,14 @@ public class CoverManager : MonoBehaviour
 
 
 
-    public void SetSquads(int _no_of_squad_members)
+    public void SetSquads(int _no_of_squadies)
     {
-        for (int i = 0; i < _no_of_squad_members / 2; i++)
+        for (int i = 0; i < _no_of_squadies / 2; i++)
         {
             squad_one_position_ids.Add(0);
         }
 
-        for (int i = _no_of_squad_members / 2; i < _no_of_squad_members; i++)
+        for (int i = _no_of_squadies / 2; i < _no_of_squadies; i++)
         {
             squad_two_position_ids.Add(0);
         }

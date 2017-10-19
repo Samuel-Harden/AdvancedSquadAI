@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private LevelGenerator level_generator;
-    private CoverManager   cover_manager;
-    private SquadGenerator squad_generator;
-    private EnemyGenerator enemy_generator;
+    private LevelGenerator   level_generator;
+    private SquadGenerator   squad_generator;
+    private EnemyGenerator   enemy_generator;
+    private FormationManager formation_manager;
+    private CoverManager     cover_manager;
 
 
     public GameObject player;
@@ -23,7 +24,7 @@ public class GameManager : MonoBehaviour
     public float cover_spacing = 0;
 
     // Squad Generation Variables
-    public int no_of_squad_members = 0;
+    public int no_of_squadies = 0;
 
     private int no_of_enemies = 0;
 
@@ -31,12 +32,15 @@ public class GameManager : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        level_generator = gameObject.GetComponent<LevelGenerator>();
-        cover_manager   = gameObject.GetComponent<CoverManager>();
-        squad_generator = gameObject.GetComponent<SquadGenerator>();
-        enemy_generator = gameObject.GetComponent<EnemyGenerator>();
+        int squad_size = 0;
 
-        no_of_enemies = no_of_squad_members * 2;
+        level_generator   = gameObject.GetComponent<LevelGenerator>();
+        squad_generator   = gameObject.GetComponent<SquadGenerator>();
+        enemy_generator   = gameObject.GetComponent<EnemyGenerator>();
+        cover_manager     = gameObject.GetComponent<CoverManager>();
+        formation_manager = gameObject.GetComponent<FormationManager>();
+
+        no_of_enemies = no_of_squadies * 2;
 
         level_generator.GenerateNewLevel(level_height, level_width, grid_section_size);
 
@@ -48,13 +52,26 @@ public class GameManager : MonoBehaviour
         //player.transform.position = new Vector3(30.0f, 0.0f, 30.0f);
 
         // Generate Squad
-        if (no_of_squad_members > 8)
-            no_of_squad_members = 8;
+        if (no_of_squadies > 8)
+            no_of_squadies = 8;
 
         // Position ID's
-        cover_manager.SetSquads(no_of_squad_members);
+        cover_manager.SetSquads(no_of_squadies);
 
-        squad_generator.GenerateSquad(no_of_squad_members, cover_manager.StartupCover(no_of_squad_members, player.transform.position));
+        squad_generator.GenerateSquad(no_of_squadies, cover_manager.StartupCover(no_of_squadies, player.transform.position));
+
+        if(no_of_squadies%2 == 1) // If we have a remainder ie Squad sizes are not even
+        {
+            squad_size = no_of_squadies / 2 + 1; // We use the biggest squad size
+        }
+
+        if(no_of_squadies%2 == 0) // If they are even all good
+        {
+            squad_size = no_of_squadies / 2;
+        }
+
+        // Tell the formation manager about the largest squad size
+        formation_manager.GenerateFormations(player, squad_size);
 
         enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()));
     }

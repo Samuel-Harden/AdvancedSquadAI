@@ -6,7 +6,8 @@ using System.Collections.Generic;
 public class AIController : MonoBehaviour
 {
     public Transform formation_pos;
-    public Vector3 target;
+    public Vector3 target_pos;
+    private GameObject target_obj;
     UnityEngine.AI.NavMeshAgent agent;
 
     private Animator animator;
@@ -26,7 +27,7 @@ public class AIController : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        target = this.gameObject.transform.position;
+        target_pos = this.gameObject.transform.position;
 
         distance_check = false;
         corner_check = false;
@@ -44,10 +45,13 @@ public class AIController : MonoBehaviour
     {
         if (form_up == true)
         {
-            target = formation_pos.position;
+            Following();
         }
 
-        Moving();
+        if (form_up == false)
+        {
+            Moving();
+        }
 
         // If Iam not moving and am on a corner
         if (moving_to_cover == false && moving_to_position == false && in_corner_cover == true)
@@ -61,17 +65,28 @@ public class AIController : MonoBehaviour
 
 
 
+    void Following()
+    {
+        if (Vector3.Distance(transform.position, target_obj.transform.position) > 0.5f)
+        {
+            if(target_obj != null)
+            agent.SetDestination(target_obj.transform.position);
+        }
+    }
+
+
+
     void Moving()
     {
-        if (Vector3.Distance(this.gameObject.transform.position, target) > 0.5f)
+        if (Vector3.Distance(transform.position, target_pos) > 0.5f)
         {
-            agent.SetDestination(target);
+            agent.SetDestination(target_pos);
         }
 
         // Bool used so we only do the distance related stuff once!
         if (distance_check == false)
         {
-            if (Vector3.Distance(this.gameObject.transform.position, target) < 0.5f)
+            if (Vector3.Distance(transform.position, target_pos) < 0.5f)
             {
                 if (moving_to_cover == true)
                 {
@@ -131,11 +146,11 @@ public class AIController : MonoBehaviour
     {
         Debug.Log("Cover Order");
 
-        target = _pos;
+        target_pos = _pos;
         form_up = false;
 
-        target.y = transform.position.y;
-        transform.LookAt(target);
+        target_pos.y = transform.position.y;
+        transform.LookAt(target_pos);
 
         moving_to_cover = true;
         moving_to_position = false;
@@ -151,11 +166,11 @@ public class AIController : MonoBehaviour
     {
         Debug.Log("Move Order");
 
-        target = _pos;
+        target_pos = _pos;
         form_up = false;
 
-        target.y = transform.position.y;
-        transform.LookAt(target);
+        target_pos.y = transform.position.y;
+        transform.LookAt(target_pos);
 
         moving_to_cover = false;
         moving_to_position = true;
@@ -166,14 +181,23 @@ public class AIController : MonoBehaviour
     }
 
 
-
+    // PROB NEED TO DELETE OBSOLETE
     public void FollowPlayer()
     {
-        target = formation_pos.position;
-        target.y = transform.position.y;
-        transform.LookAt(target);
+        target_pos = formation_pos.position;
+        target_pos.y = transform.position.y;
+        transform.LookAt(target_pos);
 
         form_up = true;
+    }
+
+
+
+    public void SetTarget(GameObject _target)
+    {
+        target_obj = _target;
+        form_up = true;
+        Debug.Log("cheese");
     }
 
 
