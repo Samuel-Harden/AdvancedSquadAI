@@ -8,12 +8,14 @@ public class SquadGenerator : MonoBehaviour
     public GameObject squad_member_prefab;
 
     // Script simply Generates Squad Members and assigns them to a Squad
-    public void GenerateSquad(int _no_squad_members, List<Vector3> _squad_positions)
+    public void GenerateSquad(int _no_squad_members, List<Vector3> _squad_positions, ref List<GameObject> _squadies)
     {
 
         for (int i = 0; i < _no_squad_members; i++)
         {
             var squadie = Instantiate(squad_member_prefab, _squad_positions[i], squad_member_prefab.transform.rotation);
+
+            _squadies.Add(squadie);
 
             if (i < _no_squad_members / 2)
             {

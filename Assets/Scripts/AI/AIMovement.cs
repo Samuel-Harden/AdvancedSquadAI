@@ -79,8 +79,6 @@ public class AIMovement : MonoBehaviour
 
     public void CoverOrder(Vector3 _pos)
     {
-        Debug.Log("Cover Order");
-
         target = _pos;
         form_up = false;
 
@@ -98,8 +96,6 @@ public class AIMovement : MonoBehaviour
 
     public void MoveOrder(Vector3 _pos)
     {
-        Debug.Log("Move Order");
-
         target = _pos;
         form_up = false;
 

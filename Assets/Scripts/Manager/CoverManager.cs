@@ -514,4 +514,15 @@ public class CoverManager : MonoBehaviour
         }
         return enemy_cover_positions;
     }
+
+
+
+    public void FlushUnusedPositions(List<GameObject> _squadies, List<GameObject> _enemies)
+    {
+        // Loop through all positions
+        for (int i = 0; i < cover_positions.Count; i++)
+        {
+            //if(cover_position)
+        }
+    }
 }

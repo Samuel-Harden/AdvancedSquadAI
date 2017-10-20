@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
 
     public GameObject player;
 
+    private List<GameObject> squadies;
+    private List<GameObject> enemies;
+
     //Level Generation Variables
     public int level_width = 0;
     public int level_height = 0;
@@ -40,6 +43,9 @@ public class GameManager : MonoBehaviour
         cover_manager     = gameObject.GetComponent<CoverManager>();
         formation_manager = gameObject.GetComponent<FormationManager>();
 
+        squadies = new List<GameObject>();
+        enemies  = new List<GameObject>();
+
         no_of_enemies = no_of_squadies * 2;
 
         level_generator.GenerateNewLevel(level_height, level_width, grid_section_size);
@@ -58,7 +64,7 @@ public class GameManager : MonoBehaviour
         // Position ID's
         cover_manager.SetSquads(no_of_squadies);
 
-        squad_generator.GenerateSquad(no_of_squadies, cover_manager.StartupCover(no_of_squadies, player.transform.position));
+        squad_generator.GenerateSquad(no_of_squadies, cover_manager.StartupCover(no_of_squadies, player.transform.position), ref squadies);
 
         if(no_of_squadies%2 == 1) // If we have a remainder ie Squad sizes are not even
         {
@@ -71,14 +77,15 @@ public class GameManager : MonoBehaviour
         }
 
         // Tell the formation manager about the largest squad size
-        //formation_manager.GenerateFormations(player, squad_size);
+        formation_manager.GenerateFormations(player, squad_size);
 
-        //enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()));
+        enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()), ref enemies);
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+
+
+    private void LateUpdate()
     {
-		
-	}
+        cover_manager.FlushUnusedPositions(squadies, enemies);
+    }
 }

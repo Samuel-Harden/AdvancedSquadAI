@@ -16,11 +16,13 @@ public class EnemyGenerator : MonoBehaviour
 
 
 
-    public void GenerateEnemies(int _no_enemies, List<Vector3> _enemy_positions)
+    public void GenerateEnemies(int _no_enemies, List<Vector3> _enemy_positions, ref List<GameObject> _enemies)
     {
         for (int i = 0; i < _no_enemies; i++)
         {
-            Instantiate(enemy_prefab, _enemy_positions[i], enemy_prefab.transform.rotation);
+            var enemy = Instantiate(enemy_prefab, _enemy_positions[i], enemy_prefab.transform.rotation);
+
+            _enemies.Add(enemy);
         }
     }
 

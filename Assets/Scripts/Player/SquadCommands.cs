@@ -23,16 +23,17 @@ public class SquadCommands : MonoBehaviour
     private int squad_1 = 1;
     private int squad_2 = 2;
 
-    private int obstacle_layer;
+    private bool command_input;
+    private float command_timer;
 
     private Vector3 prev_hit_location;
-
 
     // Use this for initialization
     void Start()
     {
+        command_timer = 0.0f;
+        command_input = true;
         distance = 20.0f;
-        obstacle_layer = 11;
         prev_hit_location = Vector3.zero;
         cam = GetComponent<Camera>();
         squad_one = new List<AIController>();
@@ -42,9 +43,16 @@ public class SquadCommands : MonoBehaviour
 
 
     // Update is called once per frame
-    private void LateUpdate()
+    private void Update()
     {
         UserInput();
+        
+        if(command_timer > 1)
+        {                                                                                                   
+            Debug.Log("Cheese");
+            command_input = true;
+            command_timer = 0;
+        }
     }
 
 
@@ -55,7 +63,6 @@ public class SquadCommands : MonoBehaviour
         {
             FollowCommand();
         }
-
 
         if (Input.GetButtonDown("TeamFormation"))
         {
@@ -72,20 +79,19 @@ public class SquadCommands : MonoBehaviour
             formation_manager.CycleFormation(squad_one.Count, squad_two.Count, 2);
         }
 
-        if (Input.GetButtonDown("SquadOneAction") || Input.GetButtonDown("SquadTwoAction") || Input.GetButtonDown("TeamAction"))
+        if ((Input.GetButtonDown("SquadOneAction") && command_input == true) || (Input.GetButtonDown("SquadTwoAction") && command_input == true) || (Input.GetButtonDown("TeamAction") && command_input == true))
         {
-
+            Debug.Log("Pie");
             RaycastHit hit;
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
             // if the Ray hits something & is within range
-            if (Physics.Raycast(ray, out hit, distance, obstacle_layer))
+            if (Physics.Raycast(ray, out hit, distance, cover_mask))
             {
                 if (hit.collider.tag == "Ground")
                 {
                     DistanceToCoverCheck(ref hit);
                 }
-
 
                 // Set TargetIndicator Hit Pos
                 SetTargetIndicator(hit.point);
@@ -95,7 +101,6 @@ public class SquadCommands : MonoBehaviour
                 // Identify object hit
                 if (hit.collider.tag == "Full Cover" || hit.collider.tag == "Low Cover")
                 {
-                    Debug.Log("cheese");
                     CoverCommands(hit_pos);
                 }
 
@@ -109,6 +114,13 @@ public class SquadCommands : MonoBehaviour
                     MoveCommands(hit_pos);
                 }
             }
+
+            command_input = false;
+        }
+
+        if (command_input == false)
+        {
+            command_timer += Time.deltaTime;
         }
     }
 
