@@ -10,20 +10,30 @@ public class SquadCommands : MonoBehaviour
     public float max_command_distance = 20.0f;
     public GameObject target_indicator;
 
+    public GameObject position_test;
+
     private List<AIController> squad_one;
     private List<AIController> squad_two;
 
     public CoverManager cover_manager;
     public FormationManager formation_manager;
 
+    public LayerMask cover_mask;
+
     private int squad_1 = 1;
     private int squad_2 = 2;
+
+    private int obstacle_layer;
+
+    private Vector3 prev_hit_location;
 
 
     // Use this for initialization
     void Start()
     {
-        distance = 0.0f;
+        distance = 20.0f;
+        obstacle_layer = 11;
+        prev_hit_location = Vector3.zero;
         cam = GetComponent<Camera>();
         squad_one = new List<AIController>();
         squad_two = new List<AIController>();
@@ -69,17 +79,24 @@ public class SquadCommands : MonoBehaviour
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
             // if the Ray hits something & is within range
-            if (Physics.Raycast(ray, out hit) && CheckDistance(hit.point) == true)
+            if (Physics.Raycast(ray, out hit, distance, obstacle_layer))
             {
+                if (hit.collider.tag == "Ground")
+                {
+                    DistanceToCoverCheck(ref hit);
+                }
+
+
                 // Set TargetIndicator Hit Pos
                 SetTargetIndicator(hit.point);
 
-                Vector3 hit_ground = new Vector3(hit.point.x, 0.0f, hit.point.z);
+                Vector3 hit_pos = new Vector3(hit.point.x, 0.0f, hit.point.z);
 
                 // Identify object hit
                 if (hit.collider.tag == "Full Cover" || hit.collider.tag == "Low Cover")
                 {
-                    CoverCommands(hit_ground);
+                    Debug.Log("cheese");
+                    CoverCommands(hit_pos);
                 }
 
                 else if (hit.collider.tag == "Low Cover")
@@ -89,7 +106,7 @@ public class SquadCommands : MonoBehaviour
 
                 else if (hit.collider.tag == "Ground")
                 {
-                    MoveCommands(hit_ground);
+                    MoveCommands(hit_pos);
                 }
             }
         }
@@ -186,13 +203,13 @@ public class SquadCommands : MonoBehaviour
         if (Input.GetButtonDown("SquadOneAction"))
         {
             SquadCoverReset(squad_1);
-            SquadMoveOrder(_hit, squad_1);
+            SquadMoveOrder(GenerateMovePositions(_hit, squad_two), squad_1);
         }
 
         else if (Input.GetButtonDown("SquadTwoAction"))
         {
             SquadCoverReset(squad_2);
-            SquadMoveOrder(_hit, squad_2);
+            SquadMoveOrder(GenerateMovePositions(_hit, squad_two), squad_2);
         }
 
         else if (Input.GetButtonDown("TeamAction"))
@@ -215,29 +232,101 @@ public class SquadCommands : MonoBehaviour
 
             if (squad_one_avg_dist < squad_two_avg_dist)
             {
-                SquadMoveOrder(_hit, squad_1);
+                SquadMoveOrder(GenerateMovePositions(_hit, squad_two), squad_1);
 
-                StartCoroutine(SquadMoveOrderDelay(_hit, squad_2));
+                StartCoroutine(SquadMoveOrderDelay(GenerateMovePositions(_hit, squad_two), squad_2));
             }
 
             else
             {
-                SquadMoveOrder(_hit, squad_2);
+                SquadMoveOrder(GenerateMovePositions(_hit, squad_two), squad_2);
 
-                StartCoroutine(SquadMoveOrderDelay(_hit, squad_1));
+                StartCoroutine(SquadMoveOrderDelay(GenerateMovePositions(_hit, squad_one), squad_1));
             }
         }
     }
 
 
 
-    private void SquadMoveOrder(Vector3 _hit, int _squad)
+    private void DistanceToCoverCheck(ref RaycastHit _hit)
+    {
+        float angle = 0;
+        float distance = 3.2f;
+
+        for (int i = 0; i < 8; i++)
+        {
+            float radians = angle * Mathf.Deg2Rad;
+
+            float x = (_hit.point.x + distance * Mathf.Cos(radians));
+            float z = (_hit.point.z + distance * Mathf.Sin(radians));
+
+            Vector3 new_pos = new Vector3(x, 0.1f, z);
+
+            RaycastHit hit;
+
+            if (Physics.Linecast(_hit.point, new_pos, out hit, cover_mask))
+            {
+                if(hit.collider.tag == "Full Cover")
+                {
+                    _hit = hit;
+                    return;
+                }
+            }
+
+            //Debug.DrawLine(_hit.point, new_pos, Color.red, 60.0f);
+            //Instantiate(position_test, new_pos, position_test.transform.rotation);
+
+            angle += 45.0f;
+        }
+    }
+
+
+    // Creates positions for squadies to move to if order to move to a location
+    private List<Vector3> GenerateMovePositions(Vector3 _hit, List<AIController> _squad)
+    {
+        List<Vector3> positions = new List<Vector3>();
+
+        float angle = 0;
+        float distance = 2.0f;
+
+        // IF the whole Team is rallying on this position,
+        // we need 2x the number of points, so this creates an offset
+        if(_hit == prev_hit_location)
+        {
+            angle = (360 / _squad.Count) / 2;
+        }
+
+        for (int i = 0; i < _squad.Count; i++)
+        {
+            float radians = angle * Mathf.Deg2Rad;
+
+            float x = (_hit.x + distance * Mathf.Cos(radians));
+            float z = (_hit.z + distance * Mathf.Sin(radians));
+
+            Vector3 new_pos = new Vector3(x, 0.0f, z);
+
+            // USED FOR TESTING // 
+            //Instantiate(position_test, new_pos, position_test.transform.rotation);
+
+            positions.Add(new_pos);
+
+            angle += 360 / _squad.Count;
+        }
+
+        prev_hit_location = _hit;
+
+        return positions;
+    }
+
+
+
+    private void SquadMoveOrder(List<Vector3> _positions, int _squad)
     {
         if (_squad == 1)
         {
             for (int i = 0; i < squad_one.Count; i++)
             {
-                squad_one[i].MoveOrder(_hit);
+                squad_one[i].MoveOrder(_positions[i]);
             }
         }
 
@@ -245,14 +334,14 @@ public class SquadCommands : MonoBehaviour
         {
             for (int i = 0; i < squad_two.Count; i++)
             {
-                squad_two[i].MoveOrder(_hit);
+                squad_two[i].MoveOrder(_positions[i]);
             }
         }
     }
 
 
     // SAME FUNCTION AS ABOVE, JUST WITH A DELAY
-    private IEnumerator SquadMoveOrderDelay(Vector3 _hit, int _squad)
+    private IEnumerator SquadMoveOrderDelay(List<Vector3> _positions, int _squad)
     {
         yield return new WaitForSeconds(1);
 
@@ -260,7 +349,7 @@ public class SquadCommands : MonoBehaviour
         {
             for (int i = 0; i < squad_one.Count; i++)
             {
-                squad_one[i].MoveOrder(_hit);
+                squad_one[i].MoveOrder(_positions[i]);
             }
         }
 
@@ -268,7 +357,7 @@ public class SquadCommands : MonoBehaviour
         {
             for (int i = 0; i < squad_two.Count; i++)
             {
-                squad_two[i].MoveOrder(_hit);
+                squad_two[i].MoveOrder(_positions[i]);
             }
         }
     }
@@ -318,22 +407,6 @@ public class SquadCommands : MonoBehaviour
 
         else
             cover_manager.ClearSquadPositions(_squad);
-    }
-
-
-
-    bool CheckDistance(Vector3 _hit_pos)
-    {
-        distance = Vector3.Distance(cam.transform.position, _hit_pos);
-
-        // if distance is too big, return false
-        if (distance > max_command_distance)
-        {
-            return false;
-        }
-
-        // distance is good
-        else return true;
     }
 
 

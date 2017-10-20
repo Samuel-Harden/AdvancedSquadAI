@@ -71,9 +71,9 @@ public class GameManager : MonoBehaviour
         }
 
         // Tell the formation manager about the largest squad size
-        formation_manager.GenerateFormations(player, squad_size);
+        //formation_manager.GenerateFormations(player, squad_size);
 
-        enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()));
+        //enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()));
     }
 	
 	// Update is called once per frame

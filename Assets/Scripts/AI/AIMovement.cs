@@ -44,7 +44,7 @@ public class AIMovement : MonoBehaviour
             target = formation_pos.position;
         }
 
-        if (Vector3.Distance(this.gameObject.transform.position, target) > 0.5f)
+        if (Vector3.Distance(this.gameObject.transform.position, target) > 0.75f)
         {
             agent.SetDestination(target);
         }
@@ -52,7 +52,7 @@ public class AIMovement : MonoBehaviour
         // Bool used so we only do the distance related stuff once!
         if (distance_check == false)
         {
-            if (Vector3.Distance(this.gameObject.transform.position, target) < 0.5f)
+            if (Vector3.Distance(this.gameObject.transform.position, target) < 0.75f)
             {
                 if (moving_to_cover == true)
                 {

@@ -67,7 +67,7 @@ public class AIController : MonoBehaviour
 
     void Following()
     {
-        if (Vector3.Distance(transform.position, target_obj.transform.position) > 0.5f)
+        if (Vector3.Distance(transform.position, target_obj.transform.position) > 0.75f)
         {
             if(target_obj != null)
             agent.SetDestination(target_obj.transform.position);
@@ -78,7 +78,7 @@ public class AIController : MonoBehaviour
 
     void Moving()
     {
-        if (Vector3.Distance(transform.position, target_pos) > 0.5f)
+        if (Vector3.Distance(transform.position, target_pos) > 0.75f)
         {
             agent.SetDestination(target_pos);
         }
@@ -86,7 +86,7 @@ public class AIController : MonoBehaviour
         // Bool used so we only do the distance related stuff once!
         if (distance_check == false)
         {
-            if (Vector3.Distance(transform.position, target_pos) < 0.5f)
+            if (Vector3.Distance(transform.position, target_pos) < 0.75f)
             {
                 if (moving_to_cover == true)
                 {
@@ -132,7 +132,7 @@ public class AIController : MonoBehaviour
                 // If we have hit something without one, its cover!
                 if (hit.rigidbody == null)
                 {
-                    Debug.Log("Hit Something " + directions[i].direction);
+                    //Debug.Log("Hit Something " + directions[i].direction);
                     break;
                 }
             }
@@ -144,8 +144,6 @@ public class AIController : MonoBehaviour
 
     public void CoverOrder(Vector3 _pos)
     {
-        Debug.Log("Cover Order");
-
         target_pos = _pos;
         form_up = false;
 
@@ -164,8 +162,6 @@ public class AIController : MonoBehaviour
 
     public void MoveOrder(Vector3 _pos)
     {
-        Debug.Log("Move Order");
-
         target_pos = _pos;
         form_up = false;
 
@@ -196,8 +192,8 @@ public class AIController : MonoBehaviour
     public void SetTarget(GameObject _target)
     {
         target_obj = _target;
+
         form_up = true;
-        Debug.Log("cheese");
     }
 
 

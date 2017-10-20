@@ -45,7 +45,6 @@ public class FormationManager : MonoBehaviour
         {
             formation_positions.Add(child.gameObject);
             formation_positions_in_use.Add(false);
-            //Debug.Log(child.position);
         }
 
         all_formation_positions.Add(formation_positions);
