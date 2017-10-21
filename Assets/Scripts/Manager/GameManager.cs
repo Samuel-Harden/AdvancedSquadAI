@@ -46,20 +46,24 @@ public class GameManager : MonoBehaviour
         squadies = new List<GameObject>();
         enemies  = new List<GameObject>();
 
+        // Generate Squad
+        if (no_of_squadies > 8)
+            no_of_squadies = 8;
+
         no_of_enemies = no_of_squadies * 2;
 
         level_generator.GenerateNewLevel(level_height, level_width, grid_section_size);
 
         Vector3 level_size = new Vector3(level_width * grid_section_size, 0.0f, level_height * grid_section_size);
 
+        // This is to stop duplicate cover spots spawning!
+        if (cover_spacing <= 0)
+            cover_spacing = 1;
+
         cover_manager.GenerateCoverPoints(level_size, no_cover_passes_across, no_cover_passes_up, cover_spacing);
 
         // Set Player position
         //player.transform.position = new Vector3(30.0f, 0.0f, 30.0f);
-
-        // Generate Squad
-        if (no_of_squadies > 8)
-            no_of_squadies = 8;
 
         // Position ID's
         cover_manager.SetSquads(no_of_squadies);
@@ -80,12 +84,5 @@ public class GameManager : MonoBehaviour
         formation_manager.GenerateFormations(player, squad_size);
 
         enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()), ref enemies);
-    }
-
-
-
-    private void LateUpdate()
-    {
-        cover_manager.FlushUnusedPositions(squadies, enemies);
     }
 }

@@ -75,7 +75,7 @@ public class CoverManager : MonoBehaviour
 
         for (int i = 0; i < no_cover_passes_across; i++)
         {
-            hits = Physics.RaycastAll(transform.position, transform.forward, _level_dimentions.z);
+            hits = Physics.RaycastAll(transform.position, transform.forward, _level_dimentions.z, obstacle_mask);
 
             int k = 0;
             while (k < hits.Length)
@@ -349,22 +349,21 @@ public class CoverManager : MonoBehaviour
 
 
 
-    public void ClearSquadPositions(int _squad)
+    public void ClearSquadOnePositions()
     {
-        if (_squad == 1)
+        for(int i = 0; i < squad_one_position_ids.Count; i++)
         {
-            for(int i = 0; i < squad_one_position_ids.Count; i++)
-            {
-                cover_positions_in_use[squad_one_position_ids[i]] = false;
-            }
+            cover_positions_in_use[squad_one_position_ids[i]] = false;
         }
+    }
 
-        if (_squad == 2)
+
+
+    public void ClearSquadTwoPositions()
+    {
+        for (int i = 0; i < squad_two_position_ids.Count; i++)
         {
-            for (int i = 0; i < squad_two_position_ids.Count; i++)
-            {
-                cover_positions_in_use[squad_two_position_ids[i]] = false;
-            }
+            cover_positions_in_use[squad_two_position_ids[i]] = false;
         }
     }
 
@@ -375,7 +374,7 @@ public class CoverManager : MonoBehaviour
         List<Vector3> squad_new_positions = new List<Vector3>();
         List<Transform> visible_targets = new List<Transform>();
 
-    int no_positions = 0;
+        int no_positions = 0;
 
         if (_squad == 1)
         {
@@ -406,8 +405,6 @@ public class CoverManager : MonoBehaviour
                     // if the position is closer
                     if (temp_pos > (Vector3.Distance(_hit, cover_positions[j])))
                     {
-                        //BROKE IN HERE SOMEWHERE?!?
-
                         // IF THIS POSITION IS SAFE IE AN ENEMY CANT SEE IT
 
                         // Create a list of enemies in range of this position
@@ -419,7 +416,8 @@ public class CoverManager : MonoBehaviour
                             Transform enemy = enemys_in_range[k].transform;
 
                             Vector3 dir_to_target = (enemy.position - cover_positions[j]).normalized;
-                                float dist_to_target = Vector3.Distance(cover_positions[j], enemy.position);
+
+                            float dist_to_target = Vector3.Distance(cover_positions[j], enemy.position);
 
                             // Can the enemy see this position?
                             if (!Physics.Raycast(cover_positions[j], dir_to_target, dist_to_target, obstacle_mask))
@@ -513,16 +511,5 @@ public class CoverManager : MonoBehaviour
             }
         }
         return enemy_cover_positions;
-    }
-
-
-
-    public void FlushUnusedPositions(List<GameObject> _squadies, List<GameObject> _enemies)
-    {
-        // Loop through all positions
-        for (int i = 0; i < cover_positions.Count; i++)
-        {
-            //if(cover_position)
-        }
     }
 }

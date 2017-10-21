@@ -28,9 +28,14 @@ public class SquadCommands : MonoBehaviour
 
     private Vector3 prev_hit_location;
 
+    private bool squad_one_following;
+    private bool squad_two_following;
+
     // Use this for initialization
     void Start()
     {
+        squad_one_following = false;
+        squad_two_following = false;
         command_timer = 0.0f;
         command_input = true;
         distance = 20.0f;
@@ -47,9 +52,8 @@ public class SquadCommands : MonoBehaviour
     {
         UserInput();
         
-        if(command_timer > 1)
+        if(command_timer > 2)
         {                                                                                                   
-            Debug.Log("Cheese");
             command_input = true;
             command_timer = 0;
         }
@@ -59,29 +63,46 @@ public class SquadCommands : MonoBehaviour
 
     void UserInput()
     {
-        if (Input.GetButtonDown("TeamFormUp"))
+        if (Input.GetButtonDown("TeamFormUp") && command_input == true)
         {
-            FollowCommand();
+            formation_manager.ClearSquadOnePositions();
+            formation_manager.ClearSquadTwoPositions();
+            squad_one_following = true;
+            squad_two_following = true;
+            TeamFollowCommand();
+
+            command_input = false;
         }
 
-        if (Input.GetButtonDown("TeamFormation"))
+        if (Input.GetButtonDown("CycleFormation") && command_input == true)
         {
-            formation_manager.CycleFormation(squad_one.Count, squad_two.Count, 0);
+            formation_manager.ClearSquadOnePositions();
+            formation_manager.ClearSquadTwoPositions();
+
+            formation_manager.CycleFormation();
+
+            if(squad_one_following == true && squad_two_following == true)
+            {
+                TeamFollowCommand();
+            }
+
+            if (squad_one_following == true && squad_two_following == false)
+            {
+                SquadFollowCommand(squad_1);
+            }
+
+            if (squad_one_following == false && squad_two_following == true)
+            {
+                SquadFollowCommand(squad_2);
+            }
+
+            command_input = false;
         }
 
-        if (Input.GetButtonDown("SquadOneFormation"))
+        if ((Input.GetButtonDown("SquadOneAction") && command_input == true) ||
+            (Input.GetButtonDown("SquadTwoAction") && command_input == true) ||
+            (Input.GetButtonDown("TeamAction")     && command_input == true))
         {
-            formation_manager.CycleFormation(squad_one.Count, squad_two.Count, 1);
-        }
-
-        if (Input.GetButtonDown("SquadTwoFormation"))
-        {
-            formation_manager.CycleFormation(squad_one.Count, squad_two.Count, 2);
-        }
-
-        if ((Input.GetButtonDown("SquadOneAction") && command_input == true) || (Input.GetButtonDown("SquadTwoAction") && command_input == true) || (Input.GetButtonDown("TeamAction") && command_input == true))
-        {
-            Debug.Log("Pie");
             RaycastHit hit;
             Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
 
@@ -130,20 +151,30 @@ public class SquadCommands : MonoBehaviour
     {
         if (Input.GetButtonDown("SquadOneAction"))
         {
-            SquadCoverReset(squad_1);
+            cover_manager.ClearSquadOnePositions();
+            formation_manager.ClearSquadOnePositions();
             SquadGetCover(_hit, squad_1);
+
+            squad_one_following = false;
         }
 
         else if (Input.GetButtonDown("SquadTwoAction"))
         {
-            SquadCoverReset(squad_2);
+            cover_manager.ClearSquadTwoPositions();
+            formation_manager.ClearSquadTwoPositions();
             SquadGetCover(_hit, squad_2);
+            squad_two_following = false;
         }
 
         else if (Input.GetButtonDown("TeamAction"))
         {
-            SquadCoverReset(1);
-            SquadCoverReset(2);
+            cover_manager.ClearSquadOnePositions();
+            cover_manager.ClearSquadTwoPositions();
+            formation_manager.ClearSquadOnePositions();
+            formation_manager.ClearSquadTwoPositions();
+
+            squad_one_following = false;
+            squad_two_following = false;
 
             float squad_one_avg_dist = 0;
             float squad_two_avg_dist = 0;
@@ -177,10 +208,10 @@ public class SquadCommands : MonoBehaviour
 
 
     
-    private void FollowCommand()
+    private void TeamFollowCommand()
     {
-        SquadCoverReset(squad_1);
-        SquadCoverReset(squad_2);
+        cover_manager.ClearSquadOnePositions();
+        cover_manager.ClearSquadTwoPositions();
 
         float squad_one_avg_dist = 0;
         float squad_two_avg_dist = 0;
@@ -210,24 +241,46 @@ public class SquadCommands : MonoBehaviour
 
 
 
+    private void SquadFollowCommand(int _squad)
+    {
+        if (_squad == 1)
+        {
+            cover_manager.ClearSquadOnePositions();
+            SquadGetFormationPositions(squad_one.Count, squad_1);
+        }
+
+        if (_squad == 2)
+        {
+            cover_manager.ClearSquadTwoPositions();
+            SquadGetFormationPositions(squad_two.Count, squad_2);
+        }
+    }
+
+
+
     private void MoveCommands(Vector3 _hit)
     {
         if (Input.GetButtonDown("SquadOneAction"))
         {
-            SquadCoverReset(squad_1);
+            cover_manager.ClearSquadOnePositions();
             SquadMoveOrder(GenerateMovePositions(_hit, squad_two), squad_1);
+            squad_one_following = false;
         }
 
         else if (Input.GetButtonDown("SquadTwoAction"))
         {
-            SquadCoverReset(squad_2);
+            cover_manager.ClearSquadTwoPositions();
             SquadMoveOrder(GenerateMovePositions(_hit, squad_two), squad_2);
+            squad_two_following = false;
         }
 
         else if (Input.GetButtonDown("TeamAction"))
         {
-            SquadCoverReset(squad_1);
-            SquadCoverReset(squad_2);
+            cover_manager.ClearSquadOnePositions();
+            cover_manager.ClearSquadTwoPositions();
+
+            squad_one_following = false;
+            squad_two_following = false;
 
             float squad_one_avg_dist = 0;
             float squad_two_avg_dist = 0;
@@ -396,7 +449,7 @@ public class SquadCommands : MonoBehaviour
 
     private void SquadGetFormationPositions(int _no_positions, int _squad)
     {
-        SquadFormUp(formation_manager.GetFormationPositions(_no_positions), _squad);
+        SquadFormUp(formation_manager.GetFormationPositions(_no_positions, _squad), _squad);
     }
 
 
@@ -405,21 +458,9 @@ public class SquadCommands : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
 
-        SquadFormUp(formation_manager.GetFormationPositions(_no_positions), _squad);
+        SquadFormUp(formation_manager.GetFormationPositions(_no_positions, _squad), _squad);
     }
 
-
-
-    private void SquadCoverReset(int _squad)
-    {
-        if(_squad == 1)
-        {
-            cover_manager.ClearSquadPositions(_squad);
-        }
-
-        else
-            cover_manager.ClearSquadPositions(_squad);
-    }
 
 
 
@@ -437,6 +478,7 @@ public class SquadCommands : MonoBehaviour
             for(int i = 0; i < squad_one.Count; i++)
             {
                 squad_one[i].CoverOrder(_positions[i]);
+                
             }
         }
 

@@ -67,7 +67,7 @@ public class AIController : MonoBehaviour
 
     void Following()
     {
-        if (Vector3.Distance(transform.position, target_obj.transform.position) > 0.75f)
+        if (Vector3.Distance(transform.position, target_obj.transform.position) > 0.25f)
         {
             if(target_obj != null)
             agent.SetDestination(target_obj.transform.position);
@@ -78,7 +78,7 @@ public class AIController : MonoBehaviour
 
     void Moving()
     {
-        if (Vector3.Distance(transform.position, target_pos) > 0.75f)
+        if (Vector3.Distance(transform.position, target_pos) > 0.25f)
         {
             agent.SetDestination(target_pos);
         }
@@ -86,7 +86,7 @@ public class AIController : MonoBehaviour
         // Bool used so we only do the distance related stuff once!
         if (distance_check == false)
         {
-            if (Vector3.Distance(transform.position, target_pos) < 0.75f)
+            if (Vector3.Distance(transform.position, target_pos) < 0.25f)
             {
                 if (moving_to_cover == true)
                 {

@@ -24,6 +24,11 @@ public class NavMeshFollow : MonoBehaviour
             {
                 agent.SetDestination(target.position);
             }
+
+            if (Vector3.Distance(transform.position, target.position) > 5.0f)
+            {
+                transform.position = target.position;
+            }
         }
 	}
 
