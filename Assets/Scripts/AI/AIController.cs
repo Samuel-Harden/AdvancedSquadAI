@@ -5,29 +5,39 @@ using System.Collections.Generic;
 
 public class AIController : MonoBehaviour
 {
-    public Transform formation_pos;
-    public Vector3 target_pos;
+    private Transform formation_pos;
+    private Vector3 target_pos;
     private GameObject target_obj;
     UnityEngine.AI.NavMeshAgent agent;
 
+    private List<GameObject> threats;
+    public GameObject current_threat;
+
     private Animator animator;
 
-    private bool form_up;
+    private float health;
 
+    private bool form_up;
     private bool in_corner_cover;
     private bool in_cover;
     private bool moving_to_cover;
     private bool moving_to_position;
-
     private bool distance_check;
     private bool corner_check;
+
+    public Weapon weapon;
 
     // Use this for initialization
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        target_pos = this.gameObject.transform.position;
+        threats = new List<GameObject>();
+        target_pos = transform.position;
+
+        weapon = GetComponentInChildren<Weapon>();
+
+        health = 100;
 
         distance_check = false;
         corner_check = false;
@@ -36,7 +46,7 @@ public class AIController : MonoBehaviour
         in_corner_cover = false;
 
         //animator.SetBool("in_cover", false);
-        in_cover = false;
+        in_cover = true;
 
     }
 
@@ -60,6 +70,11 @@ public class AIController : MonoBehaviour
             {
                 CornerOverWatch();
             }
+        }
+
+        if (health < 0)
+        {
+            Destroy(gameObject, 0.2f);
         }
     }
 
@@ -163,17 +178,16 @@ public class AIController : MonoBehaviour
     public void MoveOrder(Vector3 _pos)
     {
         target_pos = _pos;
+        moving_to_position = true;
+
         form_up = false;
+        moving_to_cover = false;
+        in_cover = false;
+        distance_check = false;
+        corner_check = false;
 
         target_pos.y = transform.position.y;
         transform.LookAt(target_pos);
-
-        moving_to_cover = false;
-        moving_to_position = true;
-        in_cover = false;
-
-        distance_check = false;
-        corner_check = false;
     }
 
 
@@ -189,11 +203,52 @@ public class AIController : MonoBehaviour
 
 
 
+    void EngageTarget()
+    {
+        Debug.Log("I should Be Shooting");
+    }
+
+
+
     public void SetTarget(GameObject _target)
     {
         target_obj = _target;
 
         form_up = true;
+    }
+
+
+
+    public void UpdateThreats(List<GameObject> _threats)
+    {
+        threats = _threats;
+        float distance;
+
+        if(current_threat != null)
+        {
+            distance = Vector3.Distance(transform.position, current_threat.transform.position);
+        }
+        else
+        {
+            distance = 25;
+        }
+
+        for (int i = 0; i < threats.Count; i++)
+        {
+            if (Vector3.Distance(transform.position, threats[i].transform.position) < distance)
+            {
+                current_threat = threats[i];
+            }
+        }
+
+        weapon.SetTarget(current_threat);
+    }
+
+
+
+    public void DamageHealth(float _damage)
+    {
+        health -= _damage;
     }
 
 

@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
         cover_manager.GenerateCoverPoints(level_size, no_cover_passes_across, no_cover_passes_up, cover_spacing);
 
         // Set Player position
-        //player.transform.position = new Vector3(30.0f, 0.0f, 30.0f);
+        player.transform.position = new Vector3(player.transform.position.x, 1.0f, player.transform.position.z);
 
         // Position ID's
         cover_manager.SetSquads(no_of_squadies);

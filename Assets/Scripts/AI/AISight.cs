@@ -12,14 +12,15 @@ public class AISight : MonoBehaviour
     public LayerMask obstacle_mask;
     public LayerMask cover_pos_mask;
 
-    public List<Transform> visible_targets = new List<Transform>();
+    public List<GameObject> visible_targets = new List<GameObject>();
     public List<Transform> visible_cover_positions = new List<Transform>();
 
-    public CoverManager cover_manager;
+    private AIController ai_controller;
 
 	// Use this for initialization
 	void Start ()
     {
+        ai_controller = gameObject.GetComponent<AIController>();
         StartCoroutine("FindTargetsWithDelay", .2f);
 	}
 	
@@ -70,9 +71,14 @@ public class AISight : MonoBehaviour
 
                 if (!Physics.Raycast(transform.position, dir_to_target, dist_to_target, obstacle_mask))
                 {
-                    visible_targets.Add(target);
+                    visible_targets.Add(target.gameObject);
                 }
             }
+        }
+
+        if (visible_targets.Count != 0 && gameObject.tag == "Squadie")
+        {
+            ai_controller.UpdateThreats(visible_targets);
         }
     }
 

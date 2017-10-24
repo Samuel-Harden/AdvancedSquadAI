@@ -18,9 +18,9 @@ public class FieldOfViewEditor : Editor
         Handles.DrawLine(ai_sight.transform.position, ai_sight.transform.position + view_angle_b * ai_sight.view_radius);
 
         Handles.color = Color.red;
-        foreach (Transform visible_target in ai_sight.visible_targets)
+        foreach (GameObject visible_target in ai_sight.visible_targets)
         {
-            Handles.DrawLine(ai_sight.transform.position, visible_target.position);
+            Handles.DrawLine(ai_sight.transform.position, visible_target.transform.position);
         }
 
         Handles.color = Color.green;

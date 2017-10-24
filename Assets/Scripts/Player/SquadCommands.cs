@@ -31,6 +31,8 @@ public class SquadCommands : MonoBehaviour
     private bool squad_one_following;
     private bool squad_two_following;
 
+    private bool axis_in_use = false;
+
     // Use this for initialization
     void Start()
     {
@@ -51,8 +53,22 @@ public class SquadCommands : MonoBehaviour
     private void Update()
     {
         UserInput();
-        
-        if(command_timer > 2)
+
+        if(Input.GetAxis("TeamFormUpDPAD") != 0)
+        {
+            if (axis_in_use == false)
+            {
+                Debug.Log("Dpad pressed");
+                axis_in_use = true;
+            }
+        }
+
+        if (Input.GetAxis("TeamFormUpDPAD") == 0)
+        {
+            axis_in_use = false;
+        }
+
+        if (command_timer > 2)
         {                                                                                                   
             command_input = true;
             command_timer = 0;
