@@ -16,11 +16,13 @@ public class AISight : MonoBehaviour
     public List<Transform> visible_cover_positions = new List<Transform>();
 
     private AIController ai_controller;
+    private TurretAI turret_ai;
 
 	// Use this for initialization
 	void Start ()
     {
-        ai_controller = gameObject.GetComponent<AIController>();
+        ai_controller = GetComponentInParent<AIController>();
+        turret_ai = GetComponentInParent<TurretAI>();
         StartCoroutine("FindTargetsWithDelay", .2f);
 	}
 	
@@ -76,9 +78,17 @@ public class AISight : MonoBehaviour
             }
         }
 
-        if (visible_targets.Count != 0 && gameObject.tag == "Squadie")
+        if (visible_targets.Count != 0)
         {
-            ai_controller.UpdateThreats(visible_targets);
+            if(CompareTag("Squadie"))
+            {
+                ai_controller.UpdateThreats(visible_targets);
+            }
+
+            if (CompareTag("Enemy"))
+            {
+                turret_ai.UpdateThreats(visible_targets);
+            }
         }
     }
 

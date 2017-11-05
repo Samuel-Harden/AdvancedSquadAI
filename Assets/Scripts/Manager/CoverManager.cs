@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class CoverManager : MonoBehaviour
 {
-    public GameObject temp_object;
-    public bool test_cover_pos_markers = false;
+    [SerializeField] GameObject temp_object;
+    [SerializeField] bool test_cover_pos_markers = false;
+
+    [SerializeField] LayerMask squadie_mask;
+    [SerializeField] LayerMask enemy_mask;
+    [SerializeField] LayerMask obstacle_mask;
+
+    [SerializeField] RaycastHit[] hits;
 
     private List<Vector3> cover_positions;
 
@@ -21,12 +27,6 @@ public class CoverManager : MonoBehaviour
     private int no_cover_passes_up = 0;
     private float nav_mesh_offset = 0.5f;
     private float cover_spacing = 0.0f;
-
-    public LayerMask squadie_mask;
-    public LayerMask enemy_mask;
-    public LayerMask obstacle_mask;
-
-    public RaycastHit[] hits;
 
     private void Start()
     {
@@ -413,9 +413,10 @@ public class CoverManager : MonoBehaviour
                         // loop through them to see which can be seen
                         for (int k = 0; k < enemys_in_range.Length; k++)
                         {
-                            Transform enemy = enemys_in_range[k].transform;
+                            Transform enemy = enemys_in_range[k].GetComponentInChildren<AISight>().transform;
 
                             Vector3 dir_to_target = (enemy.position - cover_positions[j]).normalized;
+                            //Vector3 dir_to_target = (enemy.position - new Vector3 (cover_positions[j].x, cover_positions[j].y + 1, cover_positions[j].z)).normalized;
 
                             float dist_to_target = Vector3.Distance(cover_positions[j], enemy.position);
 

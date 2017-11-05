@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     private FormationManager formation_manager;
     private CoverManager     cover_manager;
 
+    public SquadCommands squad_commands;
+
 
     public GameObject player;
 
@@ -50,7 +52,7 @@ public class GameManager : MonoBehaviour
         if (no_of_squadies > 8)
             no_of_squadies = 8;
 
-        no_of_enemies = no_of_squadies * 2;
+        //no_of_enemies = no_of_squadies * 2;
 
         level_generator.GenerateNewLevel(level_height, level_width, grid_section_size);
 
@@ -83,6 +85,6 @@ public class GameManager : MonoBehaviour
         // Tell the formation manager about the largest squad size
         formation_manager.GenerateFormations(player, squad_size);
 
-        enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()), ref enemies);
+        //enemy_generator.GenerateEnemies(no_of_enemies, cover_manager.GetEnemyPositions(no_of_enemies, enemy_generator.GetSpawnPoints()), ref enemies);
     }
 }

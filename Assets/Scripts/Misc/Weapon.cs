@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    private WeaponFire weapon_fire;
     private Vector3 reset_pos;
     private GameObject target;
 
@@ -13,11 +12,15 @@ public class Weapon : MonoBehaviour
 
     private float shot_timer;
 
+    public GameObject bullet;
+    public Transform bullet_spawn_point;
+    [SerializeField] float rot_speed = 5.0f;
+    [SerializeField] float fire_rate = 2.0f;
+
     // Use this for initialization
     void Start ()
     {
         shot_timer = 2.0f;
-        weapon_fire = GetComponentInChildren<WeaponFire>();
         target_lined_up = false;
         tracking_target = false;
         reset_pos = transform.position;
@@ -26,21 +29,7 @@ public class Weapon : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-		if (tracking_target == true && target != null)
-        {
-            SmoothLook();
 
-            if(TargetLinedUp() == true)
-            {
-                if (shot_timer > 2)
-                {
-                    weapon_fire.FireRound();
-                    shot_timer = 0.0f;
-                }
-            }
-        }
-
-        shot_timer += Time.deltaTime;
 	}
 
 
@@ -63,7 +52,7 @@ public class Weapon : MonoBehaviour
     {
         Vector3 direction = target.transform.position - transform.position;
         Quaternion new_rot = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, new_rot, Time.deltaTime * 5.0f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, new_rot, Time.deltaTime * rot_speed);
     }
 
 
@@ -72,7 +61,7 @@ public class Weapon : MonoBehaviour
     {
         float angle = Vector3.Angle(transform.forward, target.transform.position - transform.position);
 
-        if (angle < 5.0f)
+        if (angle < 2.0f)
         {
             target_lined_up = true;
             return true;
@@ -80,5 +69,27 @@ public class Weapon : MonoBehaviour
 
         target_lined_up = false;
         return false;
+    }
+
+
+
+    public void FireWeapon()
+    {
+        if (tracking_target == true && target != null)
+        {
+            SmoothLook();
+
+            if (TargetLinedUp() == true)
+            {
+                if (shot_timer > fire_rate)
+                {
+                    Instantiate(bullet, bullet_spawn_point.position, bullet_spawn_point.rotation);
+
+                    shot_timer = 0.0f;
+                }
+            }
+        }
+
+        shot_timer += Time.deltaTime;
     }
 }

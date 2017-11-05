@@ -35,19 +35,19 @@ public class Projectile : MonoBehaviour
         if (other.gameObject.tag == "Squadie")
         {
             other.GetComponent<AIController>().DamageHealth(damage);
-            Destroy(gameObject, 0.2f);
+            Destroy(gameObject);
         }
 
         if (other.gameObject.tag == "Player")
         {
             //other.GetComponent<BlahBlah>().DamageHealth(damage);
-            Destroy(gameObject, 0.2f);
+            Destroy(gameObject);
         }
 
         if (other.gameObject.tag == "Enemy")
         {
-            other.GetComponent<EnemyAI>().DamageHealth(damage);
-            Destroy(gameObject, 0.2f);
+            other.GetComponent<TurretAI>().DamageHealth(damage);
+            Destroy(gameObject);
         }
     }
 }

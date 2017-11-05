@@ -52,6 +52,7 @@ public class SquadCommands : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+
         UserInput();
 
         if(Input.GetAxis("TeamFormUpDPAD") != 0)
@@ -479,11 +480,11 @@ public class SquadCommands : MonoBehaviour
 
 
 
-
     void SetTargetIndicator(Vector3 _hit_pos)
     {
         target_indicator.transform.position = _hit_pos;
     }
+
 
 
     // Move Squad to given positions
@@ -494,7 +495,6 @@ public class SquadCommands : MonoBehaviour
             for(int i = 0; i < squad_one.Count; i++)
             {
                 squad_one[i].CoverOrder(_positions[i]);
-                
             }
         }
 
